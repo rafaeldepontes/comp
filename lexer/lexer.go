@@ -1,8 +1,8 @@
 package lexer
 
 import (
-	"fmt"
 	"regexp"
+	"strings"
 )
 
 type regexHandler func(l *lexer, reg *regexp.Regexp)
@@ -17,11 +17,13 @@ type lexer struct {
 	Tokens   []Token
 	src      string
 	pos      int
+	col      int
 	line     int
 }
 
 func (l *lexer) advanceN(n int) {
 	l.pos += n
+	l.col += n
 }
 
 func (l *lexer) push(t Token) {
@@ -50,8 +52,7 @@ func numberHandler(l *lexer, reg *regexp.Regexp) {
 }
 
 func stringHandler(l *lexer, reg *regexp.Regexp) {
-	match := reg.FindStringIndex(l.remainder())
-	sl := l.remainder()[match[0]:match[1]]
+	sl := reg.FindString(l.remainder())
 
 	l.push(NewToken(String, sl))
 	l.advanceN(len(sl))
@@ -74,13 +75,18 @@ func skipHandler(l *lexer, reg *regexp.Regexp) {
 	l.advanceN(match[1])
 }
 
-func commentHandler(l *lexer, reg *regexp.Regexp) {
-	match := reg.FindStringIndex(l.remainder())
+func newLineHandler(l *lexer, reg *regexp.Regexp) {
+	l.advanceN(len(string("\n")))
+	l.pos++
+	l.line++
+	l.col = 1
+}
 
-	if match != nil {
-		l.advanceN(match[1])
-		l.line++
-	}
+func commentHandler(l *lexer, reg *regexp.Regexp) {
+	match := reg.FindString(l.remainder())
+
+	l.line += strings.Count(match, "\n")
+	l.advanceN(len(match))
 }
 
 func newLexer(src string) *lexer {
@@ -91,7 +97,11 @@ func newLexer(src string) *lexer {
 		Tokens: make([]Token, 0),
 		patterns: []regexpPattern{
 			{
-				reg: regexp.MustCompile(`\s+`),
+				reg: regexp.MustCompile(`\n`),
+				h:   newLineHandler,
+			},
+			{
+				reg: regexp.MustCompile(`[ \t\r]+`),
 				h:   skipHandler,
 			},
 			{
@@ -242,7 +252,7 @@ func newLexer(src string) *lexer {
 	}
 }
 
-func Tokenize(src string) []Token {
+func Tokenize(path, src string) []Token {
 	l := newLexer(src)
 
 	for !l.atEOF() {
@@ -258,11 +268,9 @@ func Tokenize(src string) []Token {
 			}
 		}
 
-		// TODO: improve this to show the location where the error occurred
 		if !matched {
-			test := l.remainder()
-			println(test)
-			panic(fmt.Sprintf("[ERROR] unrecognized token near %s\n", l.remainder()))
+			ErrorHandler(*l, src, path)
+			panic(0)
 		}
 	}
 

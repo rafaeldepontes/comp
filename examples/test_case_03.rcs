@@ -1,0 +1,3 @@
+print(xibata);
+^&(mut); // This should break...
+import coffee;
