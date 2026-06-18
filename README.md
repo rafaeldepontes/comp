@@ -4,6 +4,7 @@ Project built with [Gini](https://gini-webserver.up.railway.app/)
 
 Welcome to **Comp**, an educational compiler project written in Go. The goal of this project is to demystify how compilers work by building one from scratch, showing every phase of the translation pipeline from source code to executable machine code (via C/GCC).
 
+>All of this wouldn't be possible if it weren't for this guy, [Tlaceby](https://github.com/tlaceby/parser-series/tree/main), and my college's old books and slides.
 ---
 
 ## The Compilation Pipeline
