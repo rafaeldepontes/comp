@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/rafaeldepontes/comp/lexer"
 )
@@ -14,6 +16,21 @@ var TestFilePaths = []string{
 }
 
 func main() {
+	text := "Choose your lexer type (e.g.: 1): "
+	fmt.Println(text + "\n> 1. Regex\n> 2. State Machine")
+
+	fmt.Println("\033[A\033[A\033[A\033[A\033[A")
+	fmt.Println("\r")
+	fmt.Printf("\033[%dC", len(text))
+
+	reader := bufio.NewReader(os.Stdin)
+	opt, err := reader.ReadString('\n')
+	if err != nil {
+		panic(err)
+	}
+
+	type_ := strings.TrimSpace(opt)
+
 	for i := range TestFilePaths {
 		b, err := os.ReadFile(TestFilePaths[i])
 		if err != nil {
@@ -21,7 +38,17 @@ func main() {
 		}
 		src := string(b)
 
-		tokens := lexer.Tokenize(TestFilePaths[i], src)
+		var tokens []lexer.Token
+		switch type_ {
+		case "1":
+			tokens = lexer.TokenizeRegex(TestFilePaths[i], src)
+
+		case "2":
+			tokens = lexer.TokenizeStateMachine(TestFilePaths[i], src)
+
+		default:
+			tokens = lexer.TokenizeStateMachine(TestFilePaths[i], src)
+		}
 		for j := range tokens {
 			tokens[j].Debbug()
 		}

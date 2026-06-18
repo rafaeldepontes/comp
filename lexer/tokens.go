@@ -1,6 +1,9 @@
 package lexer
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 type TokenType int
 
@@ -104,19 +107,14 @@ func NewToken(type_ TokenType, val string) Token {
 }
 
 func (t Token) isOneOfMany(exp ...TokenType) bool {
-	for i := range exp {
-		if exp[i] == t.Type {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(exp, t.Type)
 }
 
 func (t Token) Debbug() {
 	if t.isOneOfMany(Identifier, String, Number) {
-		fmt.Printf("%s (%s)\n", TokenTypeString(t.Type), t.Val)
+		fmt.Printf("type: %s, \t\t\t      (%s)\n", TokenTypeString(t.Type), t.Val)
 	} else {
-		fmt.Printf("%s ()%s\n", TokenTypeString(t.Type), t.Val)
+		fmt.Printf("type: %s, \t\t\tValue: %s \n", TokenTypeString(t.Type), t.Val)
 	}
 }
 

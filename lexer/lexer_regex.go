@@ -77,7 +77,6 @@ func skipHandler(l *lexer, reg *regexp.Regexp) {
 
 func newLineHandler(l *lexer, reg *regexp.Regexp) {
 	l.advanceN(len(string("\n")))
-	l.pos++
 	l.line++
 	l.col = 1
 }
@@ -93,6 +92,7 @@ func newLexer(src string) *lexer {
 	return &lexer{
 		pos:    0,
 		line:   1,
+		col:    1,
 		src:    src,
 		Tokens: make([]Token, 0),
 		patterns: []regexpPattern{
@@ -252,7 +252,7 @@ func newLexer(src string) *lexer {
 	}
 }
 
-func Tokenize(path, src string) []Token {
+func TokenizeRegex(path, src string) []Token {
 	l := newLexer(src)
 
 	for !l.atEOF() {
