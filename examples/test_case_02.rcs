@@ -1,0 +1,51 @@
+import fs;
+import path;
+import time;
+
+struct Lexer {
+    sourceCode: string,
+}
+
+impl Lexer {
+    fn mount(sourceCode: string) {
+        this.sourceCode = sourceCode;
+    }
+
+    fn tokenizeSource() {
+        let allChars: []string = fs.readDir(this.sourceCode);
+        let tokens: []string = [];
+
+        foreach char in allChars {
+            let currentLexeme: string = path.join("", char);
+            let tokenInfo: TokenInfo = fs.stat(currentLexeme);
+
+            if this.isValidToken(tokenInfo.type_) {
+                tokens.push(currentLexeme);
+            }
+        }
+
+        foreach token in tokens {
+            println(token, fs.stat(token).type_);
+        }
+    }
+
+    fn isValidToken(type_: TokenType): boolean {
+        let ignoredType: TokenType = time.now() - time.hours(24);
+
+        type_ > ignoredType;
+    }
+}
+
+fn main() {
+    const source: string = "
+        let x = 10;
+        println(x);
+    ";
+
+    const lexer = new Lexer();
+
+    lexer.mount(source);
+    lexer.tokenizeSource();
+}
+
+main();
