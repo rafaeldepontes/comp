@@ -16,6 +16,7 @@ var TestFilePaths = []string{
 	// "./examples/test_case_02.rcs",
 	// "./examples/test_case_03.rcs",
 	"./examples/test_case_04.rcs",
+	"./examples/test_case_05.rcs",
 }
 
 func main() {

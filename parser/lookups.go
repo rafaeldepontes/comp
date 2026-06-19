@@ -72,4 +72,7 @@ func createTokensLookups() {
 	nud(lexer.Number, parsePrimaryExpr)
 	nud(lexer.String, parsePrimaryExpr)
 	nud(lexer.Identifier, parsePrimaryExpr)
+
+	stmt(lexer.Let, parseValDeclStmt)
+	stmt(lexer.Const, parseValDeclStmt)
 }
