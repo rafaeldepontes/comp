@@ -109,6 +109,10 @@ func newLexer(src string) *lexer {
 				h:   commentHandler,
 			},
 			{
+				reg: regexp.MustCompile(`(?s)/\*.*?\*/`),
+				h:   commentHandler,
+			},
+			{
 				reg: regexp.MustCompile(`"[^"]*"`),
 				h:   stringHandler,
 			},

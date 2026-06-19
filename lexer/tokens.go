@@ -14,6 +14,12 @@ const (
 	False
 	Number
 	String
+	Boolean
+	Return
+	This
+	Struct
+	Array
+	Impl
 	Identifier
 
 	OpenBracket
@@ -86,12 +92,16 @@ var KwdMem = map[string]TokenType{
 	"fn":      Fn,
 	"if":      If,
 	"else":    Else,
-	"forEach": Foreach,
+	"foreach": Foreach,
 	"while":   While,
 	"for":     For,
 	"export":  Export,
 	"typeof":  Typeof,
 	"in":      In,
+	"return":  Return,
+	"struct":  Struct,
+	"this":    This,
+	"impl":    Impl,
 }
 
 type Token struct {
@@ -226,6 +236,16 @@ func TokenTypeString(tt TokenType) string {
 		return "export"
 	case In:
 		return "in"
+	case Return:
+		return "return"
+	case This:
+		return "this"
+	case Impl:
+		return "impl"
+	case Struct:
+		return "struct"
+	case Boolean:
+		return "boolean"
 	default:
 		return fmt.Sprintf("unknown(%d)", tt)
 	}

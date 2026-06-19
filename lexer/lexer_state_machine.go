@@ -41,6 +41,30 @@ func isComments(l *lexer, ch byte) bool {
 	return false
 }
 
+func isMultiLineComment(l *lexer, ch byte, path string) bool {
+	if ch == '/' && l.pos+1 < len(l.src) && l.src[l.pos+1] == '*' {
+		l.advanceN(2)
+		for l.pos < len(l.src) && l.src[l.pos-1:l.pos+1] != "*/" {
+			if l.src[l.pos] == '\n' {
+				l.line++
+				l.col = 1
+				l.pos++
+			} else {
+				l.advanceN(1)
+			}
+		}
+
+		if l.pos < len(l.src) && l.src[l.pos-1:l.pos+1] == "*/" {
+			l.advanceN(2)
+			return true
+		} else {
+			ErrorHandler(*l, l.src, path)
+			panic(0)
+		}
+	}
+	return false
+}
+
 func isStringLiteral(l *lexer, ch byte, path string) bool {
 	if ch == '"' {
 		start := l.pos
@@ -124,6 +148,7 @@ func TokenizeStateMachine(path, src string) []Token {
 		if isWhiteSpaces(l, ch) ||
 			isNewLine(l, ch) ||
 			isComments(l, ch) ||
+			isMultiLineComment(l, ch, path) ||
 			isStringLiteral(l, ch, path) ||
 			isNumberLiteral(l, ch) ||
 			isIdentifierOrKeyword(l, ch) {

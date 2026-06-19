@@ -41,7 +41,7 @@ func led(type_ lexer.TokenType, bp BindingPower, ledFn ledHandler) {
 }
 
 func nud(type_ lexer.TokenType, nudFn nudHandler) {
-	bpLT[type_] = Primary
+	// bpLT[type_] = Primary
 	nudLT[type_] = nudFn
 }
 
@@ -69,10 +69,30 @@ func createTokensLookups() {
 	led(lexer.Slash, Multiplicative, parseBinaryExpr)
 	led(lexer.Percent, Multiplicative, parseBinaryExpr)
 
+	led(lexer.Assignment, Assignment, parseBinaryExpr)
+
+	led(lexer.OpenParen, Call, parseCallExpr)
+	led(lexer.Dot, Member, parseMemberExpr)
+
 	nud(lexer.Number, parsePrimaryExpr)
 	nud(lexer.String, parsePrimaryExpr)
 	nud(lexer.Identifier, parsePrimaryExpr)
 
+	nud(lexer.True, parsePrimaryExpr)
+	nud(lexer.False, parsePrimaryExpr)
+
+	nud(lexer.OpenParen, parseGroupingExpr)
+	nud(lexer.New, parseNewExpr)
+	nud(lexer.This, parseThisExpr)
+
 	stmt(lexer.Let, parseValDeclStmt)
 	stmt(lexer.Const, parseValDeclStmt)
+	stmt(lexer.Import, parseImportStmt)
+	stmt(lexer.Struct, parseStructStmt)
+	stmt(lexer.Fn, parseFuncStmt)
+	stmt(lexer.Impl, parseImplStmt)
+	stmt(lexer.If, parseIfStmt)
+	stmt(lexer.While, parseWhileStmt)
+	stmt(lexer.Foreach, parseForEachStmt)
+	stmt(lexer.For, parseForStmt)
 }

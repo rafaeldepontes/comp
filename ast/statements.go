@@ -5,26 +5,90 @@ type BlockStmt struct {
 	Body []Stmt
 }
 
-func (bs BlockStmt) stmt() {
-
-}
+func (bs BlockStmt) stmt() {}
 
 // any shit...*;* <--
 type ExpressionStmt struct {
 	Expression Expr
 }
 
-func (es ExpressionStmt) stmt() {
-
-}
+func (es ExpressionStmt) stmt() {}
 
 type VarDeclStmt struct {
 	VariableName  string
 	IsConstant    bool
 	AssignedValue Expr
-	// ExplicitType Type
+	ExplicitType  Type
 }
 
-func (vd VarDeclStmt) stmt() {
+func (vd VarDeclStmt) stmt() {}
 
+type ImportStmt struct {
+	PackageName string
 }
+
+func (i ImportStmt) stmt() {}
+
+type StructFields struct {
+	Name string
+	Type Type
+}
+type StructStmt struct {
+	Name   string
+	Fields []StructFields
+}
+
+func (s StructStmt) stmt() {}
+
+type FuncParam struct {
+	Name string
+	Type Type
+}
+
+type FuncStmt struct {
+	Name       string
+	Parameters []FuncParam
+	ReturnType Type
+	Body       BlockStmt
+}
+
+func (f FuncStmt) stmt() {}
+
+type ImplStmt struct {
+	Name    string
+	Methods []FuncStmt
+}
+
+func (i ImplStmt) stmt() {}
+
+type IfStmt struct {
+	Condition Expr
+	Then      BlockStmt
+	Else      Stmt
+}
+
+func (i IfStmt) stmt() {}
+
+type WhileStmt struct {
+	Condition Expr
+	Body      BlockStmt
+}
+
+func (w WhileStmt) stmt() {}
+
+type ForEachStmt struct {
+	Item     string
+	Iterable Expr
+	Body     BlockStmt
+}
+
+func (f ForEachStmt) stmt() {}
+
+type ForStmt struct {
+	Init Stmt
+	Cond Expr
+	Post Expr
+	Body BlockStmt
+}
+
+func (f ForStmt) stmt() {}
