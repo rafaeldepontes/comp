@@ -55,10 +55,7 @@ type FuncParam struct {
 }
 
 type FuncStmt struct {
-	Name       string
-	Parameters []FuncParam
-	ReturnType Type
-	Body       BlockStmt
+	Function
 }
 
 func (f FuncStmt) stmt() {}

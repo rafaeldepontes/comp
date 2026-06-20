@@ -18,7 +18,6 @@ const (
 	Return
 	This
 	Struct
-	Array
 	Impl
 	Identifier
 

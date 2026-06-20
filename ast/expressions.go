@@ -81,7 +81,7 @@ type BooleanExpr struct {
 
 func (b BooleanExpr) expr() {}
 
-type NullExpr struct {}
+type NullExpr struct{}
 
 func (n NullExpr) expr() {}
 
@@ -90,3 +90,24 @@ type ArrayLiteralExpr struct {
 }
 
 func (a ArrayLiteralExpr) expr() {}
+
+type IndexExpr struct {
+	Collection Expr
+	Index      Expr
+	Bracket    lexer.Token
+}
+
+func (i IndexExpr) expr() {}
+
+type Function struct {
+	Name       string
+	Params     []FuncParam
+	ReturnType Type
+	Body       BlockStmt
+}
+
+type FuncDeclExpr struct {
+	Function
+}
+
+func (fd FuncDeclExpr) expr() {}

@@ -1,0 +1,15 @@
+fn dontKnow(action: string) {
+    if action == "know" {
+        print("I know that");
+    } else {
+        print("Idk what this means");
+    }
+
+    // clear the action, don't have any motive
+    // just testing actions
+    action = "";
+
+    let arr: []number = [1, 2, 3];
+    arr[0] += arr[len(arr)-1];
+    print("This is the expected outcome: %d", arr[0]);
+}

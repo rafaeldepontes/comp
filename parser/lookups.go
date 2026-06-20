@@ -94,6 +94,8 @@ func createTokensLookups() {
 	led(lexer.OpenParen, Call, parseCallExpr)
 	led(lexer.Dot, Member, parseMemberExpr)
 
+	led(lexer.OpenBracket, Primary, parseIndexExpr)
+
 	nud(lexer.Number, parsePrimaryExpr)
 	nud(lexer.String, parsePrimaryExpr)
 	nud(lexer.Identifier, parsePrimaryExpr)
@@ -113,4 +115,5 @@ func createTokensLookups() {
 	nud(lexer.OpenBracket, parseArrayExpr)
 	nud(lexer.New, parseNewExpr)
 	nud(lexer.This, parseThisExpr)
+	nud(lexer.Fn, parseFuncExpr)
 }

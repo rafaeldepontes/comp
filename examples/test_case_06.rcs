@@ -10,8 +10,8 @@ const add = fn(x: number, y: number): number {
   x + y;
 };
 
-//tasks.interval(fn(task: TaskInfo){
+tasks.interval(fn(task: TaskInfo){
   if task.time > time.second * 10 {
     tasks.kill(task.id);
   }
-//}, 1000);
+}, 1000);

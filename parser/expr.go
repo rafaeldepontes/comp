@@ -152,6 +152,7 @@ func parseCallExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
 		args = append(args, parseExpr(p, DefaultBP))
 		if p.currentTokenType() == lexer.Comma {
 			p.advance()
+
 		} else if p.currentTokenType() != lexer.CloseParen {
 			panic(
 				fmt.Sprintf("expected ',' or ')' after argument, but got %s",
@@ -234,5 +235,26 @@ func parseArrayExpr(p *parser) ast.Expr {
 	_ = p.expect(lexer.CloseBracket)
 	return ast.ArrayLiteralExpr{
 		Elements: elements,
+	}
+}
+
+func parseIndexExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
+	open := p.advance() // consume '['
+	collection := parseExpr(p, DefaultBP)
+
+	p.expect(lexer.CloseBracket)
+
+	return ast.IndexExpr{
+		Bracket:    open,
+		Collection: collection,
+		Index:      left,
+	}
+}
+
+func parseFuncExpr(p *parser) ast.Expr {
+	_ = p.advance() // consume 'fn'
+
+	return ast.FuncDeclExpr{
+		Function: parseFuncGeneric(p),
 	}
 }
