@@ -8,7 +8,7 @@ import (
 type BindingPower int
 
 const (
-	DefaltBP BindingPower = iota
+	DefaultBP BindingPower = iota
 	Comma
 	Assignment
 	Logical
@@ -45,7 +45,7 @@ func nud(type_ lexer.TokenType, nudFn nudHandler) {
 }
 
 func stmt(type_ lexer.TokenType, stmtFn stmtHandler) {
-	bpLT[type_] = DefaltBP
+	bpLT[type_] = DefaultBP
 	stmtLT[type_] = stmtFn
 }
 
@@ -83,6 +83,10 @@ func createTokensLookups() {
 	led(lexer.Assignment, Assignment, parseAssignExpr)
 	led(lexer.PlusEquals, Assignment, parseAssignExpr)
 	led(lexer.MinusEquals, Assignment, parseAssignExpr)
+	led(lexer.StarEquals, Assignment, parseAssignExpr)
+	led(lexer.SlashEquals, Assignment, parseAssignExpr)
+	led(lexer.PercentEquals, Assignment, parseAssignExpr)
+	led(lexer.NullishAssignment, Assignment, parseAssignExpr)
 
 	led(lexer.PlusPlus, Unary, parsePostfixExpr)
 	led(lexer.MinusMinus, Unary, parsePostfixExpr)
@@ -96,14 +100,17 @@ func createTokensLookups() {
 
 	nud(lexer.True, parsePrimaryExpr)
 	nud(lexer.False, parsePrimaryExpr)
+	nud(lexer.Null, parsePrimaryExpr)
 
 	nud(lexer.PlusPlus, parsePrefixExpr)
 	nud(lexer.MinusMinus, parsePrefixExpr)
 
 	nud(lexer.Plus, parsePrefixExpr)
 	nud(lexer.Dash, parsePrefixExpr)
+	nud(lexer.Not, parsePrefixExpr)
 
 	nud(lexer.OpenParen, parseGroupingExpr)
+	nud(lexer.OpenBracket, parseArrayExpr)
 	nud(lexer.New, parseNewExpr)
 	nud(lexer.This, parseThisExpr)
 }

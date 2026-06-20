@@ -241,12 +241,24 @@ func newLexer(src string) *lexer {
 				h:   defaultHandler(Dash, "-"),
 			},
 			{
-				reg: regexp.MustCompile(`/`),
-				h:   defaultHandler(Slash, "/"),
+				reg: regexp.MustCompile(`-=`),
+				h:   defaultHandler(MinusEquals, "-="),
+			},
+			{
+				reg: regexp.MustCompile(`/=`),
+				h:   defaultHandler(Slash, "/="),
+			},
+			{
+				reg: regexp.MustCompile(`\*=`),
+				h:   defaultHandler(StarEquals, "*="),
 			},
 			{
 				reg: regexp.MustCompile(`\*`),
 				h:   defaultHandler(Star, "*"),
+			},
+			{
+				reg: regexp.MustCompile(`%=`),
+				h:   defaultHandler(PercentEquals, "%="),
 			},
 			{
 				reg: regexp.MustCompile(`%`),

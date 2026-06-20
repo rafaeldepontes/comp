@@ -55,6 +55,9 @@ const (
 	MinusMinus
 	PlusEquals
 	MinusEquals
+	StarEquals
+	PercentEquals
+	SlashEquals
 	NullishAssignment
 
 	// Math Ops
@@ -145,33 +148,33 @@ func TokenTypeString(tt TokenType) string {
 	case Identifier:
 		return "identifier"
 	case OpenBracket:
-		return "openBracket"
+		return "open bracket"
 	case CloseBracket:
-		return "closeBracket"
+		return "close bracket"
 	case OpenCurly:
-		return "openCurly"
+		return "open curly"
 	case CloseCurly:
-		return "closeCurly"
+		return "close curly"
 	case OpenParen:
-		return "openParen"
+		return "open paren"
 	case CloseParen:
-		return "closeParen"
+		return "close paren"
 	case Assignment:
 		return "assignment"
 	case Equals:
 		return "equals"
 	case NotEquals:
-		return "not_equals"
+		return "not equals"
 	case Not:
 		return "not"
 	case Less:
 		return "less"
 	case LessEquals:
-		return "lessEquals"
+		return "less equals"
 	case Greater:
 		return "greater"
 	case GreaterEquals:
-		return "greaterEquals"
+		return "greater equals"
 	case Or:
 		return "or"
 	case And:
@@ -179,9 +182,9 @@ func TokenTypeString(tt TokenType) string {
 	case Dot:
 		return "dot"
 	case DotDot:
-		return "dotDot"
+		return "dot-dot"
 	case SemiColon:
-		return "semiColon"
+		return "semi colon"
 	case Colon:
 		return "colon"
 	case Question:
@@ -189,15 +192,15 @@ func TokenTypeString(tt TokenType) string {
 	case Comma:
 		return "comma"
 	case PlusPlus:
-		return "plusPlus"
+		return "plus plus"
 	case MinusMinus:
-		return "minusMinus"
+		return "minus minus"
 	case PlusEquals:
-		return "plusEquals"
+		return "plus equals"
 	case MinusEquals:
-		return "minusEquals"
+		return "minus equals"
 	case NullishAssignment:
-		return "nullishAssignment"
+		return "nullish assignment"
 	case Plus:
 		return "plus"
 	case Dash:
@@ -246,6 +249,12 @@ func TokenTypeString(tt TokenType) string {
 		return "struct"
 	case Boolean:
 		return "boolean"
+	case StarEquals:
+		return "star equals"
+	case PercentEquals:
+		return "percent equals"
+	case SlashEquals:
+		return "slash equals"
 	default:
 		return fmt.Sprintf("unknown(%d)", tt)
 	}

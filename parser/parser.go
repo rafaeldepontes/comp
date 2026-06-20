@@ -17,6 +17,24 @@ func (p *parser) hasTokens() bool {
 	return p.pos < len(p.tokens) && p.currentTokenType() != lexer.EOF
 }
 
+func (p *parser) synchronize() {
+	p.advance()
+	for p.hasTokens() {
+		if p.tokens[p.pos-1].Type == lexer.SemiColon {
+			return
+		}
+
+		switch p.currentTokenType() {
+		case lexer.Class, lexer.Fn, lexer.Let, lexer.Const, lexer.For, lexer.If, lexer.While, lexer.Return, lexer.Struct, lexer.Impl, lexer.Import:
+			return
+		case lexer.CloseCurly:
+			return
+		}
+
+		p.advance()
+	}
+}
+
 func (p *parser) currentTokenType() lexer.TokenType {
 	return p.currentToken().Type
 }
@@ -42,7 +60,11 @@ func (p *parser) expectError(expectedType lexer.TokenType, err error) lexer.Toke
 				lexer.TokenTypeString(type_),
 			)
 		}
-		panic(err)
+		p.errors = append(p.errors, err)
+		return lexer.Token{
+			Type: expectedType,
+			Val:  "",
+		}
 	}
 
 	return p.advance()
@@ -64,6 +86,16 @@ func Parse(tokens []lexer.Token) ast.BlockStmt {
 	for p.hasTokens() {
 		body = append(body, parseStmt(p))
 	}
+
+	println("[INFO] Parser errors:")
+	if len(p.errors) == 0 {
+		println("None.")
+	} else {
+		for i := range p.errors {
+			println(p.errors[i].Error())
+		}
+	}
+	println("")
 
 	return ast.BlockStmt{
 		Body: body,

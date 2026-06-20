@@ -59,14 +59,17 @@ func main() {
 			tokens = lexer.TokenizeStateMachine(TestFilePaths[i], src)
 		}
 
-		for j := range tokens {
-			tokens[j].Debbug()
-		}
+		// Tokens are alright I guess...
+		// for j := range tokens {
+		// 	tokens[j].Debbug()
+		// }
 
 		fmt.Printf("\n\ncode snippet inside examples file: %s\n\n%s\n", TestFilePaths[i], src)
 		println("=============\n\n")
 
 		ast := parser.Parse(tokens)
+
+		// This is ok also... I think I can finally start writting the AST
 		litter.Dump(ast)
 	}
 }

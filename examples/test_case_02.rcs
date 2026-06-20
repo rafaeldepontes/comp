@@ -12,8 +12,8 @@ impl Lexer {
     }
 
     fn tokenizeSource() {
-        // let allChars: []string = fs.readDir(this.sourceCode);
-        // let tokens: []string = [];
+        let allChars: []string = fs.readDir(this.sourceCode);
+        let tokens: []string = [];
 
         foreach char in allChars {
             let currentLexeme: string = path.join("", char);

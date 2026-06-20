@@ -185,14 +185,29 @@ func TokenizeStateMachine(path, src string) []Token {
 			l.push(NewToken(Comma, ","))
 			l.advanceN(1)
 		case '%':
-			l.push(NewToken(Percent, "%"))
-			l.advanceN(1)
+			if l.pos+1 < len(l.src) && l.src[l.pos+1] == '=' {
+				l.push(NewToken(PercentEquals, "%="))
+				l.advanceN(2)
+			} else {
+				l.push(NewToken(Percent, "%"))
+				l.advanceN(1)
+			}
 		case '*':
-			l.push(NewToken(Star, "*"))
-			l.advanceN(1)
+			if l.pos+1 < len(l.src) && l.src[l.pos+1] == '=' {
+				l.push(NewToken(StarEquals, "*="))
+				l.advanceN(2)
+			} else {
+				l.push(NewToken(Star, "*"))
+				l.advanceN(1)
+			}
 		case '/':
-			l.push(NewToken(Slash, "/"))
-			l.advanceN(1)
+			if l.pos+1 < len(l.src) && l.src[l.pos+1] == '=' {
+				l.push(NewToken(SlashEquals, "/="))
+				l.advanceN(2)
+			} else {
+				l.push(NewToken(Slash, "/"))
+				l.advanceN(1)
+			}
 		case '=':
 			if l.pos+1 < len(l.src) && l.src[l.pos+1] == '=' {
 				l.push(NewToken(Equals, "=="))

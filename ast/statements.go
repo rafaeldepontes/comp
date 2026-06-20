@@ -29,9 +29,17 @@ type ImportStmt struct {
 
 func (i ImportStmt) stmt() {}
 
+type FromImportStmt struct {
+	PackageName string
+	ImportName  string
+}
+
+func (f FromImportStmt) stmt() {}
+
 type StructFields struct {
-	Name string
-	Type Type
+	Name         string
+	Type         Type
+	DefaultValue Expr
 }
 type StructStmt struct {
 	Name   string

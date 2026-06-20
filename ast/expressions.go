@@ -74,3 +74,19 @@ type AssignExpr struct {
 }
 
 func (a AssignExpr) expr() {}
+
+type BooleanExpr struct {
+	Val bool
+}
+
+func (b BooleanExpr) expr() {}
+
+type NullExpr struct {}
+
+func (n NullExpr) expr() {}
+
+type ArrayLiteralExpr struct {
+	Elements []Expr
+}
+
+func (a ArrayLiteralExpr) expr() {}

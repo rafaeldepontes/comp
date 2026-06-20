@@ -14,14 +14,14 @@ func parseExpr(p *parser, bp BindingPower) ast.Expr {
 
 	nudFn, ok := nudLT[type_]
 	if !ok {
-		// panic("[ERROR] somehow I've coded poorly 1.0... Jesus man... Maybe is the age??")
-		panic(
-			fmt.Errorf(
-				"[ERROR] nud handler missing for %s",
+		p.errors = append(
+			p.errors,
+			fmt.Errorf("[ERROR] nud handler missing for %s",
 				lexer.TokenTypeString(p.currentTokenType()),
 			),
 		)
-		// NUD handler missing...
+		p.synchronize()
+		return ast.NumberExpr{} // dummy to avoid crash
 	}
 
 	left := nudFn(p)
@@ -30,14 +30,14 @@ func parseExpr(p *parser, bp BindingPower) ast.Expr {
 
 		ledFn, has := ledLT[type_]
 		if !has {
-			// panic("[ERROR] somehow I've coded poorly 2.0... Jesus man... Maybe is the age??")
-			panic(
+			p.errors = append(
+				p.errors,
 				fmt.Errorf(
 					"[ERROR] led handler missing for %s",
 					lexer.TokenTypeString(p.currentTokenType()),
 				),
 			)
-			// LED handler missing...
+			return left
 		}
 
 		left = ledFn(p, left, bpLT[p.currentTokenType()])
@@ -50,21 +50,45 @@ func parsePrimaryExpr(p *parser) ast.Expr {
 	switch p.currentTokenType() {
 	case lexer.Number:
 		number, _ := strconv.ParseFloat(p.advance().Val, 64)
-		return ast.NumberExpr{Val: number}
+		return ast.NumberExpr{
+			Val: number,
+		}
 
 	case lexer.String:
-		return ast.StringExpr{Val: p.advance().Val}
+		return ast.StringExpr{
+			Val: p.advance().Val,
+		}
 
 	case lexer.Identifier:
-		return ast.SymbolExpr{Val: p.advance().Val}
+		return ast.SymbolExpr{
+			Val: p.advance().Val,
+		}
+
+	case lexer.True:
+		p.advance()
+		return ast.BooleanExpr{
+			Val: true,
+		}
+
+	case lexer.False:
+		p.advance()
+		return ast.BooleanExpr{
+			Val: false,
+		}
+
+	case lexer.Null:
+		p.advance()
+		return ast.NullExpr{}
 
 	default:
-		panic(
-			fmt.Sprintf(
+		p.errors = append(
+			p.errors,
+			fmt.Errorf(
 				"[ERROR] cannot create primary expression from %s\n",
 				lexer.TokenTypeString(p.currentTokenType()),
 			),
 		)
+		return ast.NumberExpr{}
 	}
 }
 
@@ -85,7 +109,7 @@ func parseThisExpr(p *parser) ast.Expr {
 
 func parseGroupingExpr(p *parser) ast.Expr {
 	_ = p.expect(lexer.OpenParen)
-	expr := parseExpr(p, DefaltBP)
+	expr := parseExpr(p, DefaultBP)
 	_ = p.expect(lexer.CloseParen)
 	return expr
 }
@@ -100,11 +124,16 @@ func parseNewExpr(p *parser) ast.Expr {
 	_ = p.expect(lexer.OpenParen)
 	args := make([]ast.Expr, 0)
 	for p.currentTokenType() != lexer.CloseParen && p.hasTokens() {
-		args = append(args, parseExpr(p, DefaltBP))
+		args = append(args, parseExpr(p, DefaultBP))
 		if p.currentTokenType() == lexer.Comma {
 			p.advance()
 		} else if p.currentTokenType() != lexer.CloseParen {
-			panic(fmt.Sprintf("expected ',' or ')' after argument, but got %s", lexer.TokenTypeString(p.currentTokenType())))
+			panic(
+				fmt.Sprintf(
+					"expected ',' or ')' after argument, but got %s",
+					lexer.TokenTypeString(p.currentTokenType()),
+				),
+			)
 		}
 	}
 	_ = p.expect(lexer.CloseParen)
@@ -120,11 +149,15 @@ func parseCallExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
 	_ = p.expect(lexer.OpenParen)
 	args := make([]ast.Expr, 0)
 	for p.currentTokenType() != lexer.CloseParen && p.hasTokens() {
-		args = append(args, parseExpr(p, DefaltBP))
+		args = append(args, parseExpr(p, DefaultBP))
 		if p.currentTokenType() == lexer.Comma {
 			p.advance()
 		} else if p.currentTokenType() != lexer.CloseParen {
-			panic(fmt.Sprintf("expected ',' or ')' after argument, but got %s", lexer.TokenTypeString(p.currentTokenType())))
+			panic(
+				fmt.Sprintf("expected ',' or ')' after argument, but got %s",
+					lexer.TokenTypeString(p.currentTokenType()),
+				),
+			)
 		}
 	}
 	_ = p.expect(lexer.CloseParen)
@@ -151,7 +184,7 @@ func parseMemberExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
 
 func parsePrefixExpr(p *parser) ast.Expr {
 	opt := p.advance()
-	rhs := parseExpr(p, DefaltBP)
+	rhs := parseExpr(p, DefaultBP)
 
 	return ast.UpdateExpr{
 		Opr:      opt,
@@ -171,11 +204,35 @@ func parsePostfixExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
 
 func parseAssignExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
 	opt := p.advance()
-	rhs := parseExpr(p, bp)
+	rhs := parseExpr(p, bp-1)
 
 	return ast.AssignExpr{
 		Assigne:  left,
 		Operator: opt,
 		Value:    rhs,
+	}
+}
+
+func parseArrayExpr(p *parser) ast.Expr {
+	p.advance() // consume '['
+	elements := make([]ast.Expr, 0)
+	for p.currentTokenType() != lexer.CloseBracket && p.hasTokens() {
+		elements = append(elements, parseExpr(p, DefaultBP))
+		if p.currentTokenType() == lexer.Comma {
+			p.advance()
+		} else if p.currentTokenType() != lexer.CloseBracket {
+			p.errors = append(
+				p.errors,
+				fmt.Errorf(
+					"expected ',' or ']' in array literal, but got %s",
+					lexer.TokenTypeString(p.currentTokenType()),
+				),
+			)
+			break
+		}
+	}
+	_ = p.expect(lexer.CloseBracket)
+	return ast.ArrayLiteralExpr{
+		Elements: elements,
 	}
 }
