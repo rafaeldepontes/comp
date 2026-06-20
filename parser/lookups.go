@@ -41,7 +41,6 @@ func led(type_ lexer.TokenType, bp BindingPower, ledFn ledHandler) {
 }
 
 func nud(type_ lexer.TokenType, nudFn nudHandler) {
-	// bpLT[type_] = Primary
 	nudLT[type_] = nudFn
 }
 
@@ -51,6 +50,18 @@ func stmt(type_ lexer.TokenType, stmtFn stmtHandler) {
 }
 
 func createTokensLookups() {
+	stmt(lexer.Fn, parseFuncStmt)
+	stmt(lexer.Let, parseValDeclStmt)
+	stmt(lexer.Const, parseValDeclStmt)
+	stmt(lexer.Import, parseImportStmt)
+	stmt(lexer.Struct, parseStructStmt)
+	stmt(lexer.Class, parseClassStmt)
+	stmt(lexer.Impl, parseImplStmt)
+	stmt(lexer.If, parseIfStmt)
+	stmt(lexer.While, parseWhileStmt)
+	stmt(lexer.Foreach, parseForEachStmt)
+	stmt(lexer.For, parseForStmt)
+
 	led(lexer.And, Logical, parseBinaryExpr)
 	led(lexer.Or, Logical, parseBinaryExpr)
 	led(lexer.DotDot, Logical, parseBinaryExpr)
@@ -69,7 +80,12 @@ func createTokensLookups() {
 	led(lexer.Slash, Multiplicative, parseBinaryExpr)
 	led(lexer.Percent, Multiplicative, parseBinaryExpr)
 
-	led(lexer.Assignment, Assignment, parseBinaryExpr)
+	led(lexer.Assignment, Assignment, parseAssignExpr)
+	led(lexer.PlusEquals, Assignment, parseAssignExpr)
+	led(lexer.MinusEquals, Assignment, parseAssignExpr)
+
+	led(lexer.PlusPlus, Unary, parsePostfixExpr)
+	led(lexer.MinusMinus, Unary, parsePostfixExpr)
 
 	led(lexer.OpenParen, Call, parseCallExpr)
 	led(lexer.Dot, Member, parseMemberExpr)
@@ -81,18 +97,13 @@ func createTokensLookups() {
 	nud(lexer.True, parsePrimaryExpr)
 	nud(lexer.False, parsePrimaryExpr)
 
+	nud(lexer.PlusPlus, parsePrefixExpr)
+	nud(lexer.MinusMinus, parsePrefixExpr)
+
+	nud(lexer.Plus, parsePrefixExpr)
+	nud(lexer.Dash, parsePrefixExpr)
+
 	nud(lexer.OpenParen, parseGroupingExpr)
 	nud(lexer.New, parseNewExpr)
 	nud(lexer.This, parseThisExpr)
-
-	stmt(lexer.Let, parseValDeclStmt)
-	stmt(lexer.Const, parseValDeclStmt)
-	stmt(lexer.Import, parseImportStmt)
-	stmt(lexer.Struct, parseStructStmt)
-	stmt(lexer.Fn, parseFuncStmt)
-	stmt(lexer.Impl, parseImplStmt)
-	stmt(lexer.If, parseIfStmt)
-	stmt(lexer.While, parseWhileStmt)
-	stmt(lexer.Foreach, parseForEachStmt)
-	stmt(lexer.For, parseForStmt)
 }

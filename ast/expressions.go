@@ -1,6 +1,8 @@
 package ast
 
-import "github.com/rafaeldepontes/comp/lexer"
+import (
+	"github.com/rafaeldepontes/comp/lexer"
+)
 
 type NumberExpr struct {
 	Val float64
@@ -26,9 +28,7 @@ type BinaryExpr struct {
 	Right Expr
 }
 
-func (b BinaryExpr) expr() {
-	
-}
+func (b BinaryExpr) expr() {}
 
 type NewExpr struct {
 	Token     lexer.Token // 'new'
@@ -59,3 +59,18 @@ type MemberExpr struct {
 
 func (m MemberExpr) expr() {}
 
+type UpdateExpr struct {
+	Opr      lexer.Token
+	Operand  Expr
+	IsPrefix bool
+}
+
+func (p UpdateExpr) expr() {}
+
+type AssignExpr struct {
+	Assigne  Expr
+	Operator lexer.Token
+	Value    Expr
+}
+
+func (a AssignExpr) expr() {}

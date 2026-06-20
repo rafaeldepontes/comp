@@ -8,20 +8,6 @@ import (
 	"github.com/rafaeldepontes/comp/lexer"
 )
 
-func parseBlockStmt(p *parser) ast.BlockStmt {
-	_ = p.expect(lexer.OpenCurly)
-
-	body := make([]ast.Stmt, 0)
-	for p.currentTokenType() != lexer.CloseCurly && p.hasTokens() {
-		body = append(body, parseStmt(p))
-	}
-
-	_ = p.expect(lexer.CloseCurly)
-	return ast.BlockStmt{
-		Body: body,
-	}
-}
-
 func parseStmt(p *parser) ast.Stmt {
 	stmtFn, ok := stmtLT[p.currentTokenType()]
 	if ok {
@@ -33,6 +19,20 @@ func parseStmt(p *parser) ast.Stmt {
 
 	return ast.ExpressionStmt{
 		Expression: expr,
+	}
+}
+
+func parseBlockStmt(p *parser) ast.BlockStmt {
+	_ = p.expect(lexer.OpenCurly)
+
+	body := make([]ast.Stmt, 0)
+	for p.currentTokenType() != lexer.CloseCurly && p.hasTokens() {
+		body = append(body, parseStmt(p))
+	}
+
+	_ = p.expect(lexer.CloseCurly)
+	return ast.BlockStmt{
+		Body: body,
 	}
 }
 
@@ -261,13 +261,24 @@ func parseForEachStmt(p *parser) ast.Stmt {
 		errors.New("expected variable name in foreach loop"),
 	).Val
 
-	_ = p.expect(lexer.In)
+	var index string
+	if p.currentTokenType() == lexer.In {
+		_ = p.expect(lexer.In)
+	} else if p.currentTokenType() == lexer.Comma {
+		p.advance() // consume ','
+		index = p.expectError(
+			lexer.Identifier,
+			errors.New("expected variable name in foreach loop"),
+		).Val
+		_ = p.expect(lexer.In)
+	}
 
 	iterable := parseExpr(p, DefaltBP)
 	body := parseBlockStmt(p)
 
 	return ast.ForEachStmt{
 		Item:     itemName,
+		Index:    index,
 		Iterable: iterable,
 		Body:     body,
 	}
@@ -307,5 +318,71 @@ func parseForStmt(p *parser) ast.Stmt {
 		Cond: cond,
 		Post: post,
 		Body: body,
+	}
+}
+
+func parseClassStmt(p *parser) ast.Stmt {
+	p.advance() // consume 'class'
+
+	name := p.expectError(
+		lexer.Identifier,
+		errors.New("inside class declaration expected to find class name"),
+	).Val
+
+	_ = p.expect(lexer.OpenCurly)
+
+	fields := make([]ast.StructFields, 0)
+	methods := make([]ast.FuncStmt, 0)
+	for p.currentTokenType() != lexer.CloseCurly && p.hasTokens() {
+		switch p.currentTokenType() {
+		case lexer.Fn:
+			methods = append(methods, parseFuncStmt(p).(ast.FuncStmt))
+
+		case lexer.Let, lexer.Const:
+			p.advance()
+			fn := p.expectError(
+				lexer.Identifier,
+				errors.New("expected field name in class declaration"),
+			).Val
+
+			_ = p.expect(lexer.Colon)
+
+			ft := p.expectError(
+				lexer.Identifier,
+				errors.New("expected field type in class declaration"),
+			).Val
+
+			fields = append(fields, ast.StructFields{
+				Name: fn,
+				Type: ft,
+			})
+
+			if p.currentTokenType() == lexer.SemiColon {
+				p.advance()
+			} else if p.currentTokenType() != lexer.CloseCurly {
+				panic(
+					fmt.Sprintf(
+						"expected ',' or '}' after field declaration, but got %s",
+						lexer.TokenTypeString(p.currentTokenType()),
+					),
+				)
+			}
+
+		default:
+			panic(
+				fmt.Sprintf(
+					"unexpected token %s inside class declaration",
+					lexer.TokenTypeString(p.currentTokenType()),
+				),
+			)
+		}
+	}
+
+	_ = p.expect(lexer.CloseCurly)
+
+	return ast.ClassStmt{
+		Name:    name,
+		Fields:  fields,
+		Methods: methods,
 	}
 }

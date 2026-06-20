@@ -61,6 +61,14 @@ type ImplStmt struct {
 
 func (i ImplStmt) stmt() {}
 
+type ClassStmt struct {
+	Name    string
+	Fields  []StructFields
+	Methods []FuncStmt
+}
+
+func (c ClassStmt) stmt() {}
+
 type IfStmt struct {
 	Condition Expr
 	Then      BlockStmt
@@ -78,6 +86,7 @@ func (w WhileStmt) stmt() {}
 
 type ForEachStmt struct {
 	Item     string
+	Index    string
 	Iterable Expr
 	Body     BlockStmt
 }

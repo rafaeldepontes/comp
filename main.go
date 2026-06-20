@@ -15,6 +15,10 @@ var TestFilePaths = []string{
 	"./examples/test_case_03.rcs",
 	"./examples/test_case_04.rcs",
 	"./examples/test_case_05.rcs",
+	"./examples/test_case_06.rcs",
+	"./examples/test_case_07.rcs",
+	"./examples/test_case_08.rcs",
+	"./examples/test_case_09.rcs",
 }
 
 func main() {
@@ -34,7 +38,7 @@ func main() {
 	// }
 
 	// type_ := strings.TrimSpace(opt)
-	fmt.Println("\033c")
+	// fmt.Println("\033c")
 
 	for i := range TestFilePaths {
 		b, err := os.ReadFile(TestFilePaths[i])

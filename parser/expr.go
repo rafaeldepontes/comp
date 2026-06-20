@@ -14,7 +14,13 @@ func parseExpr(p *parser, bp BindingPower) ast.Expr {
 
 	nudFn, ok := nudLT[type_]
 	if !ok {
-		panic("[ERROR] somehow I've coded poorly 1.0... Jesus man... Maybe is the age??")
+		// panic("[ERROR] somehow I've coded poorly 1.0... Jesus man... Maybe is the age??")
+		panic(
+			fmt.Errorf(
+				"[ERROR] nud handler missing for %s",
+				lexer.TokenTypeString(p.currentTokenType()),
+			),
+		)
 		// NUD handler missing...
 	}
 
@@ -24,7 +30,13 @@ func parseExpr(p *parser, bp BindingPower) ast.Expr {
 
 		ledFn, has := ledLT[type_]
 		if !has {
-			panic("[ERROR] somehow I've coded poorly 2.0... Jesus man... Maybe is the age??")
+			// panic("[ERROR] somehow I've coded poorly 2.0... Jesus man... Maybe is the age??")
+			panic(
+				fmt.Errorf(
+					"[ERROR] led handler missing for %s",
+					lexer.TokenTypeString(p.currentTokenType()),
+				),
+			)
 			// LED handler missing...
 		}
 
@@ -134,5 +146,36 @@ func parseMemberExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
 		Object:   left,
 		Operator: opToken,
 		Property: ast.SymbolExpr{Val: propName},
+	}
+}
+
+func parsePrefixExpr(p *parser) ast.Expr {
+	opt := p.advance()
+	rhs := parseExpr(p, DefaltBP)
+
+	return ast.UpdateExpr{
+		Opr:      opt,
+		Operand:  rhs,
+		IsPrefix: true,
+	}
+}
+
+func parsePostfixExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
+	opt := p.advance()
+
+	return ast.UpdateExpr{
+		Opr:     opt,
+		Operand: left,
+	}
+}
+
+func parseAssignExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
+	opt := p.advance()
+	rhs := parseExpr(p, bp)
+
+	return ast.AssignExpr{
+		Assigne:  left,
+		Operator: opt,
+		Value:    rhs,
 	}
 }

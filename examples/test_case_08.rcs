@@ -1,0 +1,19 @@
+if random.selectOne(choices) == 50 {
+  println("Your number was selected!");
+} else {
+  println("Your number was not selected");
+}
+
+foreach value, index in choices {
+    println(value, index);
+}
+
+foreach value in choices {
+    println(value);
+}
+
+let x = 0;
+while x < 10 {
+    x += 1;
+    println(x);
+}
