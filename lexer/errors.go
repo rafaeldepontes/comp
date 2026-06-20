@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	colorReset    = "\033[0m"
-	colorBold     = "\033[1m"
-	colorBoldRed  = "\033[1;31m"
-	colorBoldCyan = "\033[1;36m"
+	ColorReset    = "\033[0m"
+	ColorBold     = "\033[1m"
+	ColorBoldRed  = "\033[1;31m"
+	ColorBoldCyan = "\033[1;36m"
 )
 
 func ErrorHandler(l lexer, src, path string) {
@@ -49,9 +49,9 @@ func ErrorHandler(l lexer, src, path string) {
 	lineNumStr := fmt.Sprintf("%d", actualLine)
 	paddingWidth := len(lineNumStr)
 
-	fmt.Printf("%serror%s: %sunrecognized token%s\n", colorBoldRed, colorReset, colorBold, colorReset)
+	fmt.Printf("%serror%s: %sunrecognized token%s\n", ColorBoldRed, ColorReset, ColorBold, ColorReset)
 	fmt.Printf("  --> %s:%d:%d\n", path, actualLine, actualCol)
-	fmt.Printf("%s%*s|%s\n", colorBoldCyan, paddingWidth+1, "", colorReset)
-	fmt.Printf("%s%d |%s %s\n", colorBoldCyan, actualLine, colorReset, lineStr)
-	fmt.Printf("%s%*s|%s %s%s%s\n", colorBoldCyan, paddingWidth+1, "", colorReset, colorBoldRed, caretLine.String(), colorReset)
+	fmt.Printf("%s%*s|%s\n", ColorBoldCyan, paddingWidth+1, "", ColorReset)
+	fmt.Printf("%s%d |%s %s\n", ColorBoldCyan, actualLine, ColorReset, lineStr)
+	fmt.Printf("%s%*s|%s %s%s%s\n", ColorBoldCyan, paddingWidth+1, "", ColorReset, ColorBoldRed, caretLine.String(), ColorReset)
 }

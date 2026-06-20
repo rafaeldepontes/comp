@@ -1,7 +1,9 @@
 let p2 = 1;
 let p3 = 2;
-let p4 = p3 = p2; // This should be allowed?
+let p4 = p3 = p2;
+
 p5 = p3 + 3;
+
 let p6 += 7;
 let p7 -= 8;
 let p8 *= 9;

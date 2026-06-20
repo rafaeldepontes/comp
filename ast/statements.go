@@ -2,7 +2,8 @@ package ast
 
 // { [...]Stmt }
 type BlockStmt struct {
-	Body []Stmt
+	Body   []Stmt
+	Errors []error
 }
 
 func (bs BlockStmt) stmt() {}

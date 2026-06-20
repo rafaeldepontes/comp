@@ -6,9 +6,9 @@ fn abs (n: number): number {
   -n;
 }
 
-//const add = fn(x: number, y: number): number {
-//  x + y;
-//};
+const add = fn(x: number, y: number): number {
+  x + y;
+};
 
 //tasks.interval(fn(task: TaskInfo){
   if task.time > time.second * 10 {

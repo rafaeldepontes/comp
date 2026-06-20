@@ -64,12 +64,22 @@ func main() {
 		// 	tokens[j].Debbug()
 		// }
 
-		fmt.Printf("\n\ncode snippet inside examples file: %s\n\n%s\n", TestFilePaths[i], src)
-		println("=============\n\n")
-
 		ast := parser.Parse(tokens)
 
-		// This is ok also... I think I can finally start writting the AST
-		litter.Dump(ast)
+		if len(ast.Errors) > 0 {
+			fmt.Printf("%sFile: %s\n\n* Code Sample:%s\n%s\n", lexer.ColorBoldCyan, TestFilePaths[i], lexer.ColorReset, src)
+			fmt.Printf("%s%s%s\n", lexer.ColorBoldCyan, "=================================================================\n", lexer.ColorReset)
+
+			fmt.Printf("%s%s%s\n", lexer.ColorBoldCyan, "AST:", lexer.ColorReset)
+			litter.Dump(ast.Body)
+			fmt.Printf("%s%s%s\n", lexer.ColorBoldCyan, "=================================================================\n", lexer.ColorReset)
+
+			fmt.Printf("%s[INFO] Parser errors:%s\n", lexer.ColorBoldCyan, lexer.ColorReset)
+			fmt.Printf("%s", lexer.ColorBoldRed)
+			for i := range ast.Errors {
+				println(ast.Errors[i].Error())
+			}
+			fmt.Printf("%s", lexer.ColorReset)
+		}
 	}
 }

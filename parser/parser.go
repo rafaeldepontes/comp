@@ -87,17 +87,8 @@ func Parse(tokens []lexer.Token) ast.BlockStmt {
 		body = append(body, parseStmt(p))
 	}
 
-	println("[INFO] Parser errors:")
-	if len(p.errors) == 0 {
-		println("None.")
-	} else {
-		for i := range p.errors {
-			println(p.errors[i].Error())
-		}
-	}
-	println("")
-
 	return ast.BlockStmt{
-		Body: body,
+		Body:   body,
+		Errors: p.errors,
 	}
 }
