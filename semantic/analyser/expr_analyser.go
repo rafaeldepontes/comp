@@ -1,8 +1,6 @@
 package analyser
 
 import (
-	"fmt"
-
 	"github.com/rafaeldepontes/comp/ast"
 	"github.com/rafaeldepontes/comp/lexer"
 )
@@ -23,13 +21,11 @@ func (a *Analyser) checkBinary(expr ast.BinaryExpr) ast.Type {
 			return ast.PrimitiveType{Type: ast.Number}
 		}
 
-		a.Error(
-			fmt.Sprintf(
-				"[ERROR] invalid operation: %s %s %s",
-				leftT.String(),
-				lexer.TokenTypeString(expr.Opr.Type),
-				rightT.String(),
-			),
+		a.Errorf(
+			"[ERROR] invalid operation: %s %s %s",
+			leftT.String(),
+			lexer.TokenTypeString(expr.Opr.Type),
+			rightT.String(),
 		)
 		return ast.PrimitiveType{Type: ast.Invalid}
 
@@ -38,13 +34,11 @@ func (a *Analyser) checkBinary(expr ast.BinaryExpr) ast.Type {
 			return ast.PrimitiveType{Type: ast.Boolean}
 		}
 
-		a.Error(
-			fmt.Sprintf(
-				"[ERROR] invalid operation: %s %s %s",
-				leftT.String(),
-				lexer.TokenTypeString(expr.Opr.Type),
-				rightT.String(),
-			),
+		a.Errorf(
+			"[ERROR] invalid operation: %s %s %s",
+			leftT.String(),
+			lexer.TokenTypeString(expr.Opr.Type),
+			rightT.String(),
 		)
 		return ast.PrimitiveType{Type: ast.Invalid}
 
@@ -56,11 +50,9 @@ func (a *Analyser) checkBinary(expr ast.BinaryExpr) ast.Type {
 func (a *Analyser) checkSymbol(expr ast.SymbolExpr) ast.Type {
 	sym, has := a.Scp.Lookup(expr.Val)
 	if !has {
-		a.Error(
-			fmt.Sprintf(
-				"[ERROR] undefined variable: %s",
-				expr.Val,
-			),
+		a.Errorf(
+			"[ERROR] undefined variable: %s",
+			expr.Val,
 		)
 		return ast.PrimitiveType{Type: ast.Invalid}
 	}
@@ -80,33 +72,27 @@ func (a *Analyser) checkAssign(expr ast.AssignExpr) ast.Type {
 
 	sym, has := a.Scp.Lookup(lhs.Val)
 	if !has {
-		a.Error(
-			fmt.Sprintf(
-				"[ERROR] undefined variable: %s",
-				lhs.Val,
-			),
+		a.Errorf(
+			"[ERROR] undefined variable: %s",
+			lhs.Val,
 		)
 		return ast.PrimitiveType{Type: ast.Invalid}
 	}
 
 	if sym.IsConstant {
-		a.Error(
-			fmt.Sprintf(
-				"[ERROR] cannot assign to constant %s",
-				sym.Name,
-			),
+		a.Errorf(
+			"[ERROR] cannot assign to constant %s",
+			sym.Name,
 		)
 		return ast.PrimitiveType{Type: ast.Invalid}
 	}
 
 	if !sym.Type.Equals(value) && value.GetType() != ast.Null {
-		a.Error(
-			fmt.Sprintf(
-				"[ERROR] cannot assign value of type %s to variable %s of type %s",
-				value.String(),
-				sym.Name,
-				sym.Type.String(),
-			),
+		a.Errorf(
+			"[ERROR] cannot assign value of type %s to variable %s of type %s",
+			value.String(),
+			sym.Name,
+			sym.Type.String(),
 		)
 		return ast.PrimitiveType{Type: ast.Invalid}
 	}

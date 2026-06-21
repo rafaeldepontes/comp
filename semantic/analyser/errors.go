@@ -1,6 +1,10 @@
 package analyser
 
-import "github.com/rafaeldepontes/comp/ast"
+import (
+	"fmt"
+
+	"github.com/rafaeldepontes/comp/ast"
+)
 
 type SemanticError struct {
 	Message string
@@ -14,6 +18,12 @@ type Analyser struct {
 
 func (a *Analyser) Error(msg string) {
 	a.Errors = append(a.Errors, SemanticError{Message: msg})
+}
+
+func (a *Analyser) Errorf(format string, args ...any) {
+	a.Errors = append(a.Errors, SemanticError{
+		Message: fmt.Sprintf(format, args...),
+	})
 }
 
 func (a *Analyser) WalkStmt(stmt ast.Stmt) {

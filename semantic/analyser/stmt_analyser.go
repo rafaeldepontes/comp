@@ -1,30 +1,24 @@
 package analyser
 
 import (
-	"fmt"
-
 	"github.com/rafaeldepontes/comp/ast"
 )
 
 func (a *Analyser) checkVarDecl(node ast.VarDeclStmt) {
 	if _, has := a.Scp.Lookup(node.VariableName); has {
-		a.Error(
-			fmt.Sprintf("[ERROR] %s is already declared in the current scope",
+		a.Errorf("[ERROR] %s is already declared in the current scope",
 				node.VariableName,
-			),
-		)
+			)
 	}
 
 	assignType := a.TypeCheckExpr(node.AssignedValue)
 	if !node.ExplicitType.Equals(assignType) {
-		a.Error(
-			fmt.Sprintf(
+		a.Errorf(
 				"[ERROR] cannot assign value of type %s to variable %s of type %s",
 				assignType.String(),
 				node.VariableName,
 				node.ExplicitType.String(),
-			),
-		)
+			)
 		return
 	}
 
