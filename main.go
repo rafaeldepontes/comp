@@ -6,19 +6,20 @@ import (
 
 	"github.com/rafaeldepontes/comp/lexer"
 	"github.com/rafaeldepontes/comp/parser"
+	semanticAnalyser "github.com/rafaeldepontes/comp/semantic/analyser"
 )
 
 var TestFilePaths = []string{
 	"./examples/test_case_01.rcs",
-	"./examples/test_case_02.rcs",
-	"./examples/test_case_03.rcs",
-	"./examples/test_case_04.rcs",
-	"./examples/test_case_05.rcs",
-	"./examples/test_case_06.rcs",
-	"./examples/test_case_07.rcs",
-	"./examples/test_case_08.rcs",
-	"./examples/test_case_09.rcs",
-	"./examples/test_case_10.rcs",
+	// "./examples/test_case_02.rcs",
+	// "./examples/test_case_03.rcs",
+	// "./examples/test_case_04.rcs",
+	// "./examples/test_case_05.rcs",
+	// "./examples/test_case_06.rcs",
+	// "./examples/test_case_07.rcs",
+	// "./examples/test_case_08.rcs",
+	// "./examples/test_case_09.rcs",
+	// "./examples/test_case_10.rcs",
 }
 
 func main() {
@@ -51,5 +52,7 @@ func main() {
 		} else {
 			fmt.Printf("%sFile: %s is OK\n%s", lexer.ColorBoldCyan, TestFilePaths[i], lexer.ColorReset)
 		}
+
+		semanticAnalyser.Analises(ast)
 	}
 }

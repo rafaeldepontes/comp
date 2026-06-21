@@ -8,7 +8,14 @@ import (
 	"github.com/rafaeldepontes/comp/lexer"
 )
 
-func parseType(p *parser, msg string) string {
+func parseIdentifier(p *parser, msg string) string {
+	if msg == "" {
+		msg = "expected identifier"
+	}
+	return p.expectError(lexer.Identifier, errors.New(msg)).Val
+}
+
+func parseType(p *parser, msg string) ast.Type {
 	if msg == "" {
 		msg = "expected type name"
 	}
@@ -16,9 +23,28 @@ func parseType(p *parser, msg string) string {
 	if p.currentTokenType() == lexer.OpenBracket {
 		p.advance()
 		_ = p.expect(lexer.CloseBracket)
-		return "[]" + parseType(p, msg)
+		return ast.ArrayType{
+			ElementType: parseType(p, msg),
+		}
 	}
-	return p.expectError(lexer.Identifier, errors.New(msg)).Val
+
+	token := p.expectError(lexer.Identifier, errors.New(msg))
+	typeName := token.Val
+
+	switch typeName {
+	case "number":
+		return ast.PrimitiveType{Type: ast.Number}
+	case "string":
+		return ast.PrimitiveType{Type: ast.String}
+	case "boolean":
+		return ast.PrimitiveType{Type: ast.Boolean}
+	case "null":
+		return ast.PrimitiveType{Type: ast.Null}
+	case "void":
+		return ast.PrimitiveType{Type: ast.Void}
+	default:
+		return ast.NamedType{Name: typeName}
+	}
 }
 
 func parseStmt(p *parser) ast.Stmt {
@@ -51,7 +77,7 @@ func parseBlockStmt(p *parser) ast.BlockStmt {
 
 func parseValDeclStmt(p *parser) ast.Stmt {
 	isConstant := p.advance().Type == lexer.Const
-	varName := parseType(p, "inside variable declaration expected to find variable name")
+	varName := parseIdentifier(p, "inside variable declaration expected to find variable name")
 
 	var type_ ast.Type
 	if p.currentTokenType() == lexer.Colon {
@@ -84,12 +110,12 @@ func parseValDeclStmt(p *parser) ast.Stmt {
 func parseImportStmt(p *parser) ast.Stmt {
 	_ = p.expect(lexer.Import)
 
-	nameOrPkg := parseType(p, "inside import declaration expected to find package name or import name")
+	nameOrPkg := parseIdentifier(p, "inside import declaration expected to find package name or import name")
 
 	if p.currentTokenType() == lexer.From {
 		p.advance()
 
-		pkgName := parseType(p, "expected package name after from")
+		pkgName := parseIdentifier(p, "expected package name after from")
 		_ = p.expect(lexer.SemiColon)
 		return ast.FromImportStmt{
 			PackageName: pkgName,
@@ -106,13 +132,13 @@ func parseImportStmt(p *parser) ast.Stmt {
 
 func parseStructStmt(p *parser) ast.Stmt {
 	p.advance()
-	name := parseType(p, "inside struct declaration expected to find struct name")
+	name := parseIdentifier(p, "inside struct declaration expected to find struct name")
 
 	_ = p.expect(lexer.OpenCurly)
 
 	fields := make([]ast.StructFields, 0)
 	for p.currentTokenType() != lexer.CloseCurly && p.hasTokens() {
-		fn := parseType(p, "expected field name in struct declaration")
+		fn := parseIdentifier(p, "expected field name in struct declaration")
 
 		_ = p.expect(lexer.Colon)
 
@@ -146,7 +172,7 @@ func parseStructStmt(p *parser) ast.Stmt {
 func parseFuncStmt(p *parser) ast.Stmt {
 	_ = p.expect(lexer.Fn)
 
-	name := parseType(p, "inside fn declaration expected to find function name")
+	name := parseIdentifier(p, "inside fn declaration expected to find function name")
 
 	function := parseFuncGeneric(p)
 	function.Name = name
@@ -159,7 +185,7 @@ func parseFuncStmt(p *parser) ast.Stmt {
 func parseImplStmt(p *parser) ast.Stmt {
 	p.advance() // consume 'impl'
 
-	name := parseType(p, "inside impl declaration expected to find struct name")
+	name := parseIdentifier(p, "inside impl declaration expected to find struct name")
 
 	_ = p.expect(lexer.OpenCurly)
 
@@ -223,14 +249,14 @@ func parseWhileStmt(p *parser) ast.Stmt {
 func parseForEachStmt(p *parser) ast.Stmt {
 	_ = p.expect(lexer.Foreach)
 
-	itemName := parseType(p, "expected variable name in foreach loop")
+	itemName := parseIdentifier(p, "expected variable name in foreach loop")
 
 	var index string
 	if p.currentTokenType() == lexer.In {
 		_ = p.expect(lexer.In)
 	} else if p.currentTokenType() == lexer.Comma {
 		p.advance() // consume ','
-		index = parseType(p, "expected variable name in foreach loop")
+		index = parseIdentifier(p, "expected variable name in foreach loop")
 		_ = p.expect(lexer.In)
 	}
 
@@ -285,7 +311,7 @@ func parseForStmt(p *parser) ast.Stmt {
 func parseClassStmt(p *parser) ast.Stmt {
 	p.advance() // consume 'class'
 
-	name := parseType(p, "inside class declaration expected to find class name")
+	name := parseIdentifier(p, "inside class declaration expected to find class name")
 
 	_ = p.expect(lexer.OpenCurly)
 
@@ -298,7 +324,7 @@ func parseClassStmt(p *parser) ast.Stmt {
 
 		case lexer.Let, lexer.Const:
 			p.advance()
-			fn := parseType(p, "expected field name in class declaration")
+			fn := parseIdentifier(p, "expected field name in class declaration")
 
 			_ = p.expect(lexer.Colon)
 
