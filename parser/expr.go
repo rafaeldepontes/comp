@@ -240,14 +240,14 @@ func parseArrayExpr(p *parser) ast.Expr {
 
 func parseIndexExpr(p *parser, left ast.Expr, bp BindingPower) ast.Expr {
 	open := p.advance() // consume '['
-	collection := parseExpr(p, DefaultBP)
+	idx := parseExpr(p, DefaultBP)
 
 	p.expect(lexer.CloseBracket)
 
 	return ast.IndexExpr{
 		Bracket:    open,
-		Collection: collection,
-		Index:      left,
+		Collection: left,
+		Index:      idx,
 	}
 }
 
