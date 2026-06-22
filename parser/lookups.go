@@ -50,28 +50,10 @@ func stmt(type_ lexer.TokenType, stmtFn stmtHandler) {
 }
 
 func createTokensLookups() {
-	stmt(lexer.Fn, parseFuncStmt)
 	stmt(lexer.Let, parseValDeclStmt)
-	stmt(lexer.Const, parseValDeclStmt)
-	stmt(lexer.Import, parseImportStmt)
-	stmt(lexer.Struct, parseStructStmt)
-	stmt(lexer.Class, parseClassStmt)
-	stmt(lexer.Impl, parseImplStmt)
-	stmt(lexer.If, parseIfStmt)
-	stmt(lexer.While, parseWhileStmt)
-	stmt(lexer.Foreach, parseForEachStmt)
-	stmt(lexer.For, parseForStmt)
 
-	led(lexer.And, Logical, parseBinaryExpr)
-	led(lexer.Or, Logical, parseBinaryExpr)
-	led(lexer.DotDot, Logical, parseBinaryExpr)
-
-	led(lexer.Less, Relational, parseBinaryExpr)
-	led(lexer.LessEquals, Relational, parseBinaryExpr)
-	led(lexer.Greater, Relational, parseBinaryExpr)
-	led(lexer.GreaterEquals, Relational, parseBinaryExpr)
-	led(lexer.Equals, Relational, parseBinaryExpr)
-	led(lexer.NotEquals, Relational, parseBinaryExpr)
+	nud(lexer.Number, parsePrimaryExpr)
+	nud(lexer.Identifier, parsePrimaryExpr)
 
 	led(lexer.Plus, Additive, parseBinaryExpr)
 	led(lexer.Dash, Additive, parseBinaryExpr)
@@ -79,41 +61,4 @@ func createTokensLookups() {
 	led(lexer.Star, Multiplicative, parseBinaryExpr)
 	led(lexer.Slash, Multiplicative, parseBinaryExpr)
 	led(lexer.Percent, Multiplicative, parseBinaryExpr)
-
-	led(lexer.Assignment, Assignment, parseAssignExpr)
-	led(lexer.PlusEquals, Assignment, parseAssignExpr)
-	led(lexer.MinusEquals, Assignment, parseAssignExpr)
-	led(lexer.StarEquals, Assignment, parseAssignExpr)
-	led(lexer.SlashEquals, Assignment, parseAssignExpr)
-	led(lexer.PercentEquals, Assignment, parseAssignExpr)
-	led(lexer.NullishAssignment, Assignment, parseAssignExpr)
-
-	led(lexer.PlusPlus, Unary, parsePostfixExpr)
-	led(lexer.MinusMinus, Unary, parsePostfixExpr)
-
-	led(lexer.OpenParen, Call, parseCallExpr)
-	led(lexer.Dot, Member, parseMemberExpr)
-
-	led(lexer.OpenBracket, Primary, parseIndexExpr)
-
-	nud(lexer.Number, parsePrimaryExpr)
-	nud(lexer.String, parsePrimaryExpr)
-	nud(lexer.Identifier, parsePrimaryExpr)
-
-	nud(lexer.True, parsePrimaryExpr)
-	nud(lexer.False, parsePrimaryExpr)
-	nud(lexer.Null, parsePrimaryExpr)
-
-	nud(lexer.PlusPlus, parsePrefixExpr)
-	nud(lexer.MinusMinus, parsePrefixExpr)
-
-	nud(lexer.Plus, parsePrefixExpr)
-	nud(lexer.Dash, parsePrefixExpr)
-	nud(lexer.Not, parsePrefixExpr)
-
-	nud(lexer.OpenParen, parseGroupingExpr)
-	nud(lexer.OpenBracket, parseArrayExpr)
-	nud(lexer.New, parseNewExpr)
-	nud(lexer.This, parseThisExpr)
-	nud(lexer.Fn, parseFuncExpr)
 }
