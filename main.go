@@ -11,15 +11,15 @@ import (
 
 var TestFilePaths = []string{
 	"./examples/test_case_01.rcs",
-	// "./examples/test_case_02.rcs",
-	// "./examples/test_case_03.rcs",
-	// "./examples/test_case_04.rcs",
-	// "./examples/test_case_05.rcs",
-	// "./examples/test_case_06.rcs",
-	// "./examples/test_case_07.rcs",
-	// "./examples/test_case_08.rcs",
-	// "./examples/test_case_09.rcs",
-	// "./examples/test_case_10.rcs",
+	"./examples/test_case_02.rcs",
+	"./examples/test_case_03.rcs",
+	"./examples/test_case_04.rcs",
+	"./examples/test_case_05.rcs",
+	"./examples/test_case_06.rcs",
+	"./examples/test_case_07.rcs",
+	"./examples/test_case_08.rcs",
+	"./examples/test_case_09.rcs",
+	"./examples/test_case_10.rcs",
 }
 
 func main() {

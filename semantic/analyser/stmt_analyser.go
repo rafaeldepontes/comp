@@ -36,6 +36,16 @@ func (a *Analyser) checkIf(node ast.IfStmt) {
 	// cond := a.TypeCheckExpr()
 }
 
+func (a *Analyser) checkReturn(node ast.ReturnStmt) {
+	expr := a.TypeCheckExpr(node.ReturnValue)
+
+	println(expr)
+}
+
+func (a *Analyser) checkBlock(node ast.BlockStmt) {
+	a.WalkStmt(node)
+}
+
 func (a *Analyser) checkFunc(node ast.FuncStmt) {
 	if _, ok := a.Scp.Lookup(node.Name); ok {
 		a.Errorf(
@@ -45,21 +55,34 @@ func (a *Analyser) checkFunc(node ast.FuncStmt) {
 		return
 	}
 
-	params := make([]ast.Type, 0)
-	for i := range node.Params {
-		params = append(params, a.TypeCheckExpr(node.Params[i]))
-	}
-
 	a.Scp.Define(node.Name, &Symbol{
 		Name:     node.Name,
 		IsGlobal: a.Scp.IsGlobal(),
-		Type: ast.FunctionType{
-			Name:       node.Name,
-			Params:     params,
-			ReturnType: node.ReturnType,
-		},
+		Type:     ast.FunctionType{},
 	})
 
 	scp := NewScope(a.Scp)
 	a.Scp = scp
+
+	params := make([]ast.Type, 0)
+	for i := range node.Params {
+		params = append(params, a.TypeCheckExpr(node.Params[i]))
+		a.Scp.Define(node.Params[i].Name, &Symbol{
+			Name:       node.Params[i].Name,
+			Type:       node.Params[i].Type,
+			IsConstant: false,
+			IsGlobal: a.Scp.IsGlobal(),
+		})
+	}
+
+	for i := range node.Body.Body {
+		a.WalkStmt(node.Body.Body[i])
+	}
+
+	symb, _ := a.Scp.Lookup(node.Name)
+	symb.Type = ast.FunctionType{
+		Name:       node.Name,
+		Params:     params,
+		ReturnType: node.ReturnType,
+	}
 }

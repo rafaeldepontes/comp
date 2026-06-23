@@ -12,8 +12,8 @@ x = 2;
 const b: string = "asd";
 // b = "2";
 
-fn add(a: number, b: number): number {
-    return a + b;
+fn add(a: string, b: number): number {
+    return a - b;
 }
 
-add(10, 20);
+add("10", 20);

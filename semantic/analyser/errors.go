@@ -32,8 +32,8 @@ func (a *Analyser) WalkStmt(stmt ast.Stmt) {
 		a.checkVarDecl(node)
 	case ast.ExpressionStmt:
 		a.TypeCheckExpr(node.Expression)
-	// case ast.BlockStmt:
-	// 	a.checkBlock(node)
+	case ast.BlockStmt:
+		a.checkBlock(node)
 	case ast.IfStmt:
 		a.checkIf(node)
 	// case ast.WhileStmt:
@@ -48,8 +48,8 @@ func (a *Analyser) WalkStmt(stmt ast.Stmt) {
 	// 	a.checkImpl(node)
 	// case ast.ClassStmt:
 	// 	a.checkClass(node)
-	// case ast.ReturnStmt:
-	// a.checkReturn(node)
+	case ast.ReturnStmt:
+		a.checkReturn(node)
 	default:
 		a.Error("unsupported statement type")
 	}
