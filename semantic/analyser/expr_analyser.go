@@ -57,9 +57,7 @@ func (a *Analyser) checkSymbol(expr ast.SymbolExpr) ast.Type {
 		return ast.PrimitiveType{Type: ast.Invalid}
 	}
 
-	return ast.NamedType{
-		Name: sym.Name,
-	}
+	return sym.Type
 }
 
 func (a *Analyser) checkAssign(expr ast.AssignExpr) ast.Type {
@@ -99,4 +97,62 @@ func (a *Analyser) checkAssign(expr ast.AssignExpr) ast.Type {
 
 	// change this...
 	return sym.Type
+}
+
+// TODO: Test to see if this is actually right
+// and if it's the correct behaviour.
+func (a *Analyser) checkCall(expr ast.CallExpr) ast.Type {
+	fn := a.TypeCheckExpr(expr.Callee)
+
+	if fn.GetType() != ast.Fn {
+		a.Errorf(
+			"[ERROR] %s is not a function",
+			fn.String(),
+		)
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+
+	var _ ast.NamedType
+	if fn.GetType() == ast.Struct {
+		_ = fn.(ast.NamedType)
+
+		// TODO: check structs methods???
+	}
+
+	val, ok := fn.(ast.FunctionType)
+	if !ok {
+		a.Errorf(
+			"[ERROR] %s is not a function",
+			fn.String(),
+		)
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+
+	args := make([]ast.Type, 0)
+	for i := range expr.Args {
+		args = append(args, a.TypeCheckExpr(expr.Args[i]))
+	}
+
+	if len(val.Params) != len(args) {
+		a.Errorf(
+			"[ERROR] %s expected %d but received %d parameters",
+			val.Name,
+			len(val.Params),
+			len(args),
+		)
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+
+	for i := range val.Params {
+		if !val.Params[i].Equals(args[i]) {
+			a.Errorf(
+				"[ERROR] expected %s but got %s",
+				val.Params[i].String(),
+				args[i].String(),
+			)
+			return ast.PrimitiveType{Type: ast.Invalid}
+		}
+	}
+
+	return val.ReturnType
 }

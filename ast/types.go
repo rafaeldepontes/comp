@@ -14,8 +14,6 @@ const (
 	Fn
 )
 
-// TODO: make it a real interface after the
-// complex type implementation is completed.
 type Type interface {
 	GetType() Type_
 	String() string
@@ -78,4 +76,59 @@ func (n NamedType) Equals(other Type) bool {
 		return n.Name == nt.Name
 	}
 	return false
+}
+
+type FunctionType struct {
+	Name       string
+	Params     []Type
+	ReturnType Type
+}
+
+func (f FunctionType) GetType() Type_ { return Fn }
+func (f FunctionType) String() string { return f.Name }
+func (f FunctionType) Equals(other Type) bool {
+	fn, ok := other.(FunctionType)
+	if !ok {
+		return false
+	}
+
+	if len(f.Params) != len(fn.Params) {
+		return false
+	}
+
+	for i := range f.Params {
+		if !f.Params[i].Equals(fn.Params[i]) {
+			return false
+		}
+	}
+
+	return f.ReturnType.Equals(fn.ReturnType)
+}
+
+type ParamType struct {
+	Name string
+	Type Type_
+}
+
+func (p ParamType) GetType() Type_ {
+	return p.Type
+}
+
+func (p ParamType) String() string {
+	switch p.Type {
+	case Number:
+		return "number"
+	case String:
+		return "string"
+	case Boolean:
+		return "boolean"
+	case Void:
+		return "void"
+	default:
+		return "invalid"
+	}
+}
+
+func (p ParamType) Equals(other Type) bool {
+	return p.Type == other.GetType()
 }

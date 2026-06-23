@@ -371,3 +371,14 @@ func parseClassStmt(p *parser) ast.Stmt {
 		Methods: methods,
 	}
 }
+
+func parseReturnStmt(p *parser) ast.Stmt {
+	rt := p.advance()
+	rtv := parseExpr(p, DefaultBP)
+	_ = p.expect(lexer.SemiColon)
+
+	return ast.ReturnStmt{
+		Opr:         rt,
+		ReturnValue: rtv,
+	}
+}

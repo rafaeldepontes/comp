@@ -99,6 +99,13 @@ type IndexExpr struct {
 
 func (i IndexExpr) expr() {}
 
+type FuncParam struct {
+	Name string
+	Type Type
+}
+
+func (f FuncParam) expr() {}
+
 type Function struct {
 	Name       string
 	Params     []FuncParam

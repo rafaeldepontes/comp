@@ -61,6 +61,7 @@ func createTokensLookups() {
 	stmt(lexer.While, parseWhileStmt)
 	stmt(lexer.Foreach, parseForEachStmt)
 	stmt(lexer.For, parseForStmt)
+	stmt(lexer.Return, parseReturnStmt)
 
 	led(lexer.And, Logical, parseBinaryExpr)
 	led(lexer.Or, Logical, parseBinaryExpr)

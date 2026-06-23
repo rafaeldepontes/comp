@@ -42,12 +42,14 @@ func (a *Analyser) WalkStmt(stmt ast.Stmt) {
 	// 	a.checkFor(node)
 	// case ast.ForEachStmt:
 	// 	a.checkForEach(node)
-	// case ast.FuncStmt:
-	// 	a.checkFunc(node)
+	case ast.FuncStmt:
+		a.checkFunc(node)
 	// case ast.ImplStmt:
 	// 	a.checkImpl(node)
 	// case ast.ClassStmt:
 	// 	a.checkClass(node)
+	// case ast.ReturnStmt:
+	// a.checkReturn(node)
 	default:
 		a.Error("unsupported statement type")
 	}
@@ -67,8 +69,14 @@ func (a *Analyser) TypeCheckExpr(expr ast.Expr) ast.Type {
 		return a.checkBinary(node)
 	case ast.AssignExpr:
 		return a.checkAssign(node)
-	// case ast.CallExpr:
-	// 	return a.checkCall(node)
+	case ast.CallExpr:
+		return a.checkCall(node)
+	case ast.FuncParam:
+		param := expr.(ast.FuncParam)
+		return ast.ParamType{
+			Name: param.Name,
+			Type: param.Type.GetType(),
+		}
 	// case ast.MemberExpr:
 	// 	return a.checkMember(node)
 	// case ast.NewExpr:
