@@ -12,19 +12,25 @@ func (a *Analyser) checkVarDecl(node ast.VarDeclStmt) {
 	}
 
 	assignType := a.TypeCheckExpr(node.AssignedValue)
-	if !node.ExplicitType.Equals(assignType) {
-		a.Errorf(
-			"[ERROR] cannot assign value of type %s to variable %s of type %s",
-			assignType.String(),
-			node.VariableName,
-			node.ExplicitType.String(),
-		)
-		return
+
+	type_ := node.ExplicitType
+	if type_ != nil {
+		if !type_.Equals(assignType) {
+			a.Errorf(
+				"[ERROR] cannot assign value of type %s to variable %s of type %s",
+				assignType.String(),
+				node.VariableName,
+				node.ExplicitType.String(),
+			)
+			return
+		}
+	} else {
+		type_ = assignType
 	}
 
 	sym := &Symbol{
 		Name:       node.VariableName,
-		Type:       node.ExplicitType,
+		Type:       type_,
 		IsConstant: node.IsConstant,
 		IsGlobal:   a.Scp.IsGlobal(),
 	}
@@ -71,7 +77,7 @@ func (a *Analyser) checkFunc(node ast.FuncStmt) {
 			Name:       node.Params[i].Name,
 			Type:       node.Params[i].Type,
 			IsConstant: false,
-			IsGlobal: a.Scp.IsGlobal(),
+			IsGlobal:   a.Scp.IsGlobal(),
 		})
 	}
 
