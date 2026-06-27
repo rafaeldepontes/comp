@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/rafaeldepontes/comp/ast"
+	"github.com/sanity-io/litter"
 )
 
-func Analises(p ast.BlockStmt) any {
+func Analyses(p ast.BlockStmt) any {
 	a := Analyser{
 		Scp:    NewScope(nil), // Global scope...
 		Errors: make([]SemanticError, 0),
@@ -21,5 +22,6 @@ func Analises(p ast.BlockStmt) any {
 		fmt.Println(a.Errors[i].Message)
 	}
 
+	litter.Dump(a)
 	return nil
 }

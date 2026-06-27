@@ -17,3 +17,4 @@ fn add(a: string, b: number): number {
 }
 
 add("10", 20);
+add(10, 20);

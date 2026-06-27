@@ -58,11 +58,11 @@ func (a *Analyser) WalkStmt(stmt ast.Stmt) {
 func (a *Analyser) TypeCheckExpr(expr ast.Expr) ast.Type {
 	switch node := expr.(type) {
 	case ast.NumberExpr:
-		return ast.PrimitiveType{Type: ast.Number}
+		return ast.PrimitiveType{Type: ast.Number, Val: node.Val}
 	case ast.StringExpr:
-		return ast.PrimitiveType{Type: ast.String}
+		return ast.PrimitiveType{Type: ast.String, Val: node}
 	case ast.BooleanExpr:
-		return ast.PrimitiveType{Type: ast.Boolean}
+		return ast.PrimitiveType{Type: ast.Boolean, Val: node}
 	case ast.SymbolExpr:
 		return a.checkSymbol(node)
 	case ast.BinaryExpr:

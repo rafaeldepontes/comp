@@ -69,7 +69,7 @@ const (
 	// KWD (Key Words)
 	Let
 	Const
-	Class
+	// Class
 	New
 	Import
 	From
@@ -87,7 +87,7 @@ const (
 var KwdMem = map[string]TokenType{
 	"let":     Let,
 	"const":   Const,
-	"class":   Class,
+	// "class":   Class,
 	"new":     New,
 	"import":  Import,
 	"from":    From,
@@ -214,8 +214,8 @@ func TokenTypeString(tt TokenType) string {
 		return "let"
 	case Const:
 		return "const"
-	case Class:
-		return "class"
+	// case Class:
+	// 	return "class"
 	case New:
 		return "new"
 	case Import:

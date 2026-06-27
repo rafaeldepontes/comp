@@ -25,7 +25,9 @@ func (p *parser) synchronize() {
 		}
 
 		switch p.currentTokenType() {
-		case lexer.Class, lexer.Fn, lexer.Let, lexer.Const, lexer.For, lexer.If, lexer.While, lexer.Return, lexer.Struct, lexer.Impl, lexer.Import:
+		// case lexer.Class, lexer.Fn, lexer.Let, lexer.Const, lexer.For, lexer.If, lexer.While, lexer.Return, lexer.Struct, lexer.Impl, lexer.Import:
+
+		case lexer.Fn, lexer.Let, lexer.Const, lexer.For, lexer.If, lexer.While, lexer.Return, lexer.Struct, lexer.Impl, lexer.Import:
 			return
 		case lexer.CloseCurly:
 			return

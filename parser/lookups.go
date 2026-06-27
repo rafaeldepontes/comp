@@ -55,7 +55,7 @@ func createTokensLookups() {
 	stmt(lexer.Const, parseValDeclStmt)
 	stmt(lexer.Import, parseImportStmt)
 	stmt(lexer.Struct, parseStructStmt)
-	stmt(lexer.Class, parseClassStmt)
+	// stmt(lexer.Class, parseClassStmt)
 	stmt(lexer.Impl, parseImplStmt)
 	stmt(lexer.If, parseIfStmt)
 	stmt(lexer.While, parseWhileStmt)

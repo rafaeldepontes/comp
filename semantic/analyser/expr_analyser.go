@@ -12,13 +12,13 @@ func (a *Analyser) checkBinary(expr ast.BinaryExpr) ast.Type {
 	switch expr.Opr.Type {
 	case lexer.Plus:
 		if leftT.GetType() == ast.String && rightT.GetType() == ast.String {
-			return ast.PrimitiveType{Type: ast.String}
+			return ast.PrimitiveType{Type: ast.String, Val: ""}
 		}
 		fallthrough
 
 	case lexer.Dash, lexer.Percent, lexer.Slash, lexer.Star:
 		if leftT.GetType() == ast.Number && rightT.GetType() == ast.Number {
-			return ast.PrimitiveType{Type: ast.Number}
+			return ast.PrimitiveType{Type: ast.Number, Val: 0}
 		}
 
 		a.Errorf(
@@ -31,7 +31,7 @@ func (a *Analyser) checkBinary(expr ast.BinaryExpr) ast.Type {
 
 	case lexer.Equals, lexer.NotEquals:
 		if leftT.Equals(rightT) {
-			return ast.PrimitiveType{Type: ast.Boolean}
+			return ast.PrimitiveType{Type: ast.Boolean, Val: leftT}
 		}
 
 		a.Errorf(
@@ -112,12 +112,12 @@ func (a *Analyser) checkCall(expr ast.CallExpr) ast.Type {
 		return ast.PrimitiveType{Type: ast.Invalid}
 	}
 
-	var _ ast.NamedType
-	if fn.GetType() == ast.Struct {
-		_ = fn.(ast.NamedType)
+	// var _ ast.NamedType
+	// if fn.GetType() == ast.Struct {
+	// st := fn.(ast.StructFields)
 
-		// TODO: check structs methods???
-	}
+	// TODO: check structs methods???
+	// }
 
 	val, ok := fn.(ast.FunctionType)
 	if !ok {

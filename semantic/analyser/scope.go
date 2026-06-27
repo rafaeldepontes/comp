@@ -7,6 +7,7 @@ type Symbol struct {
 	Type       ast.Type
 	IsConstant bool
 	IsGlobal   bool
+	Value      any
 }
 
 type Scope struct {

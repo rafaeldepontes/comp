@@ -33,6 +33,7 @@ func (a *Analyser) checkVarDecl(node ast.VarDeclStmt) {
 		Type:       type_,
 		IsConstant: node.IsConstant,
 		IsGlobal:   a.Scp.IsGlobal(),
+		Value:      assignType.GetValue(),
 	}
 
 	a.Scp.Define(node.VariableName, sym)

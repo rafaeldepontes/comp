@@ -64,13 +64,13 @@ type ImplStmt struct {
 
 func (i ImplStmt) stmt() {}
 
-type ClassStmt struct {
-	Name    string
-	Fields  []StructFields
-	Methods []FuncStmt
-}
+// type ClassStmt struct {
+// 	Name    string
+// 	Fields  []StructFields
+// 	Methods []FuncStmt
+// }
 
-func (c ClassStmt) stmt() {}
+// func (c ClassStmt) stmt() {}
 
 type IfStmt struct {
 	Condition Expr

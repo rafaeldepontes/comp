@@ -308,69 +308,69 @@ func parseForStmt(p *parser) ast.Stmt {
 	}
 }
 
-func parseClassStmt(p *parser) ast.Stmt {
-	p.advance() // consume 'class'
+// func parseClassStmt(p *parser) ast.Stmt {
+// 	p.advance() // consume 'class'
 
-	name := parseIdentifier(p, "inside class declaration expected to find class name")
+// 	name := parseIdentifier(p, "inside class declaration expected to find class name")
 
-	_ = p.expect(lexer.OpenCurly)
+// 	_ = p.expect(lexer.OpenCurly)
 
-	fields := make([]ast.StructFields, 0)
-	methods := make([]ast.FuncStmt, 0)
-	for p.currentTokenType() != lexer.CloseCurly && p.hasTokens() {
-		switch p.currentTokenType() {
-		case lexer.Fn:
-			methods = append(methods, parseFuncStmt(p).(ast.FuncStmt))
+// 	fields := make([]ast.StructFields, 0)
+// 	methods := make([]ast.FuncStmt, 0)
+// 	for p.currentTokenType() != lexer.CloseCurly && p.hasTokens() {
+// 		switch p.currentTokenType() {
+// 		case lexer.Fn:
+// 			methods = append(methods, parseFuncStmt(p).(ast.FuncStmt))
 
-		case lexer.Let, lexer.Const:
-			p.advance()
-			fn := parseIdentifier(p, "expected field name in class declaration")
+// 		case lexer.Let, lexer.Const:
+// 			p.advance()
+// 			fn := parseIdentifier(p, "expected field name in class declaration")
 
-			_ = p.expect(lexer.Colon)
+// 			_ = p.expect(lexer.Colon)
 
-			ft := parseType(p, "")
+// 			ft := parseType(p, "")
 
-			var defaultVal ast.Expr
-			if p.currentTokenType() == lexer.Assignment {
-				p.advance() // consume '='
-				defaultVal = parseExpr(p, DefaultBP)
-			}
+// 			var defaultVal ast.Expr
+// 			if p.currentTokenType() == lexer.Assignment {
+// 				p.advance() // consume '='
+// 				defaultVal = parseExpr(p, DefaultBP)
+// 			}
 
-			fields = append(fields, ast.StructFields{
-				Name:         fn,
-				Type:         ft,
-				DefaultValue: defaultVal,
-			})
+// 			fields = append(fields, ast.StructFields{
+// 				Name:         fn,
+// 				Type:         ft,
+// 				DefaultValue: defaultVal,
+// 			})
 
-			if p.currentTokenType() == lexer.SemiColon {
-				p.advance()
-			} else if p.currentTokenType() != lexer.CloseCurly {
-				panic(
-					fmt.Sprintf(
-						"expected ';' or '}' after field declaration, but got %s",
-						lexer.TokenTypeString(p.currentTokenType()),
-					),
-				)
-			}
+// 			if p.currentTokenType() == lexer.SemiColon {
+// 				p.advance()
+// 			} else if p.currentTokenType() != lexer.CloseCurly {
+// 				panic(
+// 					fmt.Sprintf(
+// 						"expected ';' or '}' after field declaration, but got %s",
+// 						lexer.TokenTypeString(p.currentTokenType()),
+// 					),
+// 				)
+// 			}
 
-		default:
-			panic(
-				fmt.Sprintf(
-					"unexpected token %s inside class declaration",
-					lexer.TokenTypeString(p.currentTokenType()),
-				),
-			)
-		}
-	}
+// 		default:
+// 			panic(
+// 				fmt.Sprintf(
+// 					"unexpected token %s inside class declaration",
+// 					lexer.TokenTypeString(p.currentTokenType()),
+// 				),
+// 			)
+// 		}
+// 	}
 
-	_ = p.expect(lexer.CloseCurly)
+// 	_ = p.expect(lexer.CloseCurly)
 
-	return ast.ClassStmt{
-		Name:    name,
-		Fields:  fields,
-		Methods: methods,
-	}
-}
+// 	return ast.ClassStmt{
+// 		Name:    name,
+// 		Fields:  fields,
+// 		Methods: methods,
+// 	}
+// }
 
 func parseReturnStmt(p *parser) ast.Stmt {
 	rt := p.advance()
