@@ -8,3 +8,6 @@ type Expr interface {
 	expr()
 }
 
+type Program struct {
+	Statements []Stmt
+}

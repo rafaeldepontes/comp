@@ -7,90 +7,74 @@ import (
 	"github.com/rafaeldepontes/comp/lexer"
 )
 
-type parser struct {
-	tokens []lexer.Token
-	errors []error
-	pos    int
+type Parser struct {
+	Tokens  []lexer.Token
+	Errors  []error
+	Program ast.Program
+	pos     int
 }
 
-func (p *parser) hasTokens() bool {
-	return p.pos < len(p.tokens) && p.currentTokenType() != lexer.EOF
-}
-
-func (p *parser) synchronize() {
-	p.advance()
-	for p.hasTokens() {
-		if p.tokens[p.pos-1].Type == lexer.SemiColon {
-			return
-		}
-
-		switch p.currentTokenType() {
-		// case lexer.Class, lexer.Fn, lexer.Let, lexer.Const, lexer.For, lexer.If, lexer.While, lexer.Return, lexer.Struct, lexer.Impl, lexer.Import:
-
-		case lexer.Fn, lexer.Let, lexer.Const, lexer.For, lexer.If, lexer.While, lexer.Return, lexer.Struct, lexer.Impl, lexer.Import:
-			return
-		case lexer.CloseCurly:
-			return
-		}
-
-		p.advance()
+func newParser(tokens []lexer.Token) *Parser {
+	return &Parser{
+		Tokens: tokens,
+		Errors: make([]error, 0),
+		pos:    0,
 	}
 }
 
-func (p *parser) currentTokenType() lexer.TokenType {
-	return p.currentToken().Type
+func (p *Parser) hasTokens() bool {
+	return p.pos < len(p.Tokens) && p.currentTokenType() != lexer.EOF
 }
 
-func (p *parser) currentToken() lexer.Token {
-	return p.tokens[p.pos]
+func (p *Parser) currentTokenType() lexer.TokenKind {
+	return p.currentToken().Kind
 }
 
-func (p *parser) advance() lexer.Token {
+func (p *Parser) currentToken() lexer.Token {
+	return p.Tokens[p.pos]
+}
+
+func (p *Parser) advance() lexer.Token {
 	i := p.pos
 	p.pos++
-	return p.tokens[i]
+	return p.Tokens[i]
 }
 
-func (p *parser) expectError(expectedType lexer.TokenType, err error) lexer.Token {
+func (p *Parser) expectError(expectedType lexer.TokenKind, err error) lexer.Token {
 	token := p.currentToken()
-	type_ := token.Type
+	type_ := token.Kind
 
 	if type_ != expectedType {
 		if err == nil {
 			err = fmt.Errorf("[ERROR] expected %s but received %s instead\n",
-				lexer.TokenTypeString(expectedType),
-				lexer.TokenTypeString(type_),
+				lexer.TokenKindString(expectedType),
+				lexer.TokenKindString(type_),
 			)
 		}
-		p.errors = append(p.errors, err)
+		p.Errors = append(p.Errors, err)
 		return lexer.Token{
-			Type: expectedType,
-			Val:  "",
+			Kind:  expectedType,
+			Value: "",
 		}
 	}
 
 	return p.advance()
 }
 
-func (p *parser) expect(type_ lexer.TokenType) lexer.Token {
+func (p *Parser) expect(type_ lexer.TokenKind) lexer.Token {
 	return p.expectError(type_, nil)
 }
 
-func Parse(tokens []lexer.Token) ast.BlockStmt {
-	createTokensLookups()
-	p := &parser{
-		pos:    0,
-		tokens: tokens,
-		errors: make([]error, 0),
-	}
+func Parse(tokens []lexer.Token) []ast.Stmt {
+	p := newParser(tokens)
 
-	body := make([]ast.Stmt, 0)
 	for p.hasTokens() {
-		body = append(body, parseStmt(p))
+		if p.currentTokenType() == lexer.EOF {
+			continue
+		}
+
+		p.parseStmt()
 	}
 
-	return ast.BlockStmt{
-		Body:   body,
-		Errors: p.errors,
-	}
+	return p.Program.Statements
 }
