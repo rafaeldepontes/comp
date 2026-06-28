@@ -11,7 +11,7 @@ func parseFuncGeneric(p *parser) ast.Function {
 	_ = p.expect(lexer.OpenParen)
 	params := make([]ast.FuncParam, 0)
 	for p.currentTokenType() != lexer.CloseParen && p.hasTokens() {
-		paramName := parseType(p, "expected parameter name in function declaration")
+		paramName := parseIdentifier(p, "expected parameter name in function declaration")
 
 		_ = p.expect(lexer.Colon)
 

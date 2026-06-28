@@ -118,7 +118,7 @@ func parseNewExpr(p *parser) ast.Expr {
 	newToken := p.advance() // consume 'new'
 	className := p.expectError(
 		lexer.Identifier,
-		errors.New("expected class or struct name after 'new'"),
+		errors.New("expected struct name after 'new'"),
 	).Val
 
 	_ = p.expect(lexer.OpenParen)

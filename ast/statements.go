@@ -1,5 +1,7 @@
 package ast
 
+import "github.com/rafaeldepontes/comp/lexer"
+
 // { [...]Stmt }
 type BlockStmt struct {
 	Body   []Stmt
@@ -49,11 +51,6 @@ type StructStmt struct {
 
 func (s StructStmt) stmt() {}
 
-type FuncParam struct {
-	Name string
-	Type Type
-}
-
 type FuncStmt struct {
 	Function
 }
@@ -67,13 +64,13 @@ type ImplStmt struct {
 
 func (i ImplStmt) stmt() {}
 
-type ClassStmt struct {
-	Name    string
-	Fields  []StructFields
-	Methods []FuncStmt
-}
+// type ClassStmt struct {
+// 	Name    string
+// 	Fields  []StructFields
+// 	Methods []FuncStmt
+// }
 
-func (c ClassStmt) stmt() {}
+// func (c ClassStmt) stmt() {}
 
 type IfStmt struct {
 	Condition Expr
@@ -107,3 +104,10 @@ type ForStmt struct {
 }
 
 func (f ForStmt) stmt() {}
+
+type ReturnStmt struct {
+	Opr         lexer.Token
+	ReturnValue Expr
+}
+
+func (r ReturnStmt) stmt() {}
