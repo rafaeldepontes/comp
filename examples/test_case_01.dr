@@ -1,6 +1,6 @@
 // 20 + 20 + 20 + 7 = 67;
 
-//20 + "12";
+// 20 + "12";
 21 + 13;
 
 let x: number = 1;
@@ -12,9 +12,9 @@ x = 2;
 const b: string = "asd";
 // b = "2";
 
-fn add(a: string, b: number): number {
-    return a - b;
+fn add(a: number, b: number): number {
+    return a + b;
 }
 
-add("10", 20);
-add(10, 20);
+// add("10", 20);
+printf("%f\n", add(10, 20));

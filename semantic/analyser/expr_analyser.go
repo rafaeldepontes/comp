@@ -62,45 +62,52 @@ func (a *Analyser) checkSymbol(expr ast.SymbolExpr) ast.Type {
 
 func (a *Analyser) checkAssign(expr ast.AssignExpr) ast.Type {
 	value := a.TypeCheckExpr(expr.Value)
-	lhs, ok := expr.Assigne.(ast.SymbolExpr)
-	if !ok {
+
+	switch lhs := expr.Assigne.(type) {
+	case ast.SymbolExpr:
+		sym, has := a.Scp.Lookup(lhs.Val)
+		if !has {
+			a.Errorf("[ERROR] undefined variable: %s", lhs.Val)
+			return ast.PrimitiveType{Type: ast.Invalid}
+		}
+
+		if sym.IsConstant {
+			a.Errorf("[ERROR] cannot assign to constant %s", sym.Name)
+			return ast.PrimitiveType{Type: ast.Invalid}
+		}
+
+		if !sym.Type.Equals(value) && value.GetType() != ast.Null {
+			a.Errorf(
+				"[ERROR] cannot assign value of type %s to variable %s of type %s",
+				value.String(),
+				sym.Name,
+				sym.Type.String(),
+			)
+			return ast.PrimitiveType{Type: ast.Invalid}
+		}
+		return sym.Type
+
+	case ast.MemberExpr:
+		memType := a.checkMember(lhs)
+		if memType.GetType() == ast.Invalid {
+			return ast.PrimitiveType{Type: ast.Invalid}
+		}
+		if !memType.Equals(value) && value.GetType() != ast.Null {
+			a.Errorf(
+				"[ERROR] cannot assign value of type %s to member of type %s",
+				value.String(),
+				memType.String(),
+			)
+			return ast.PrimitiveType{Type: ast.Invalid}
+		}
+		return memType
+
+	default:
 		a.Error("[ERROR] left side of assignment must be assignable")
 		return ast.PrimitiveType{Type: ast.Invalid}
 	}
-
-	sym, has := a.Scp.Lookup(lhs.Val)
-	if !has {
-		a.Errorf(
-			"[ERROR] undefined variable: %s",
-			lhs.Val,
-		)
-		return ast.PrimitiveType{Type: ast.Invalid}
-	}
-
-	if sym.IsConstant {
-		a.Errorf(
-			"[ERROR] cannot assign to constant %s",
-			sym.Name,
-		)
-		return ast.PrimitiveType{Type: ast.Invalid}
-	}
-
-	if !sym.Type.Equals(value) && value.GetType() != ast.Null {
-		a.Errorf(
-			"[ERROR] cannot assign value of type %s to variable %s of type %s",
-			value.String(),
-			sym.Name,
-			sym.Type.String(),
-		)
-		return ast.PrimitiveType{Type: ast.Invalid}
-	}
-
-	// change this...
-	return sym.Type
 }
 
-// TODO: Test to see if this is actually right
-// and if it's the correct behaviour.
 func (a *Analyser) checkCall(expr ast.CallExpr) ast.Type {
 	fn := a.TypeCheckExpr(expr.Callee)
 
@@ -111,13 +118,6 @@ func (a *Analyser) checkCall(expr ast.CallExpr) ast.Type {
 		)
 		return ast.PrimitiveType{Type: ast.Invalid}
 	}
-
-	// var _ ast.NamedType
-	// if fn.GetType() == ast.Struct {
-	// st := fn.(ast.StructFields)
-
-	// TODO: check structs methods???
-	// }
 
 	val, ok := fn.(ast.FunctionType)
 	if !ok {
@@ -155,4 +155,70 @@ func (a *Analyser) checkCall(expr ast.CallExpr) ast.Type {
 	}
 
 	return val.ReturnType
+}
+
+func (a *Analyser) checkNew(expr ast.NewExpr) ast.Type {
+	sym, ok := a.Scp.Lookup(expr.ClassName)
+	if !ok {
+		a.Errorf("[ERROR] struct %s is not defined", expr.ClassName)
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+
+	structType, ok := sym.Type.(ast.StructType)
+	if !ok {
+		a.Errorf("[ERROR] %s is not a struct", expr.ClassName)
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+
+	return structType
+}
+
+func (a *Analyser) checkMember(expr ast.MemberExpr) ast.Type {
+	objType := a.TypeCheckExpr(expr.Object)
+
+	if objType.GetType() != ast.Struct {
+		a.Errorf("[ERROR] cannot access member of non-struct type %s", objType.String())
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+
+	var structType ast.StructType
+	if st, ok := objType.(ast.StructType); ok {
+		structType = st
+	} else if nt, ok := objType.(ast.NamedType); ok {
+		sym, has := a.Scp.Lookup(nt.Name)
+		if !has {
+			return ast.PrimitiveType{Type: ast.Invalid}
+		}
+		structType = sym.Type.(ast.StructType)
+	} else {
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+
+	propExpr, ok := expr.Property.(ast.SymbolExpr)
+	if !ok {
+		a.Errorf("[ERROR] expected identifier after '.'")
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+
+	propName := propExpr.Val
+
+	if fieldType, exists := structType.Fields[propName]; exists {
+		return fieldType
+	}
+
+	if methodType, exists := structType.Methods[propName]; exists {
+		return methodType
+	}
+
+	a.Errorf("[ERROR] struct %s has no field or method %s", structType.Name, propName)
+	return ast.PrimitiveType{Type: ast.Invalid}
+}
+
+func (a *Analyser) checkThis() ast.Type {
+	sym, ok := a.Scp.Lookup("this")
+	if !ok {
+		a.Errorf("[ERROR] 'this' can only be used inside a method")
+		return ast.PrimitiveType{Type: ast.Invalid}
+	}
+	return sym.Type
 }

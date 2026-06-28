@@ -36,18 +36,18 @@ func (a *Analyser) WalkStmt(stmt ast.Stmt) {
 		a.checkBlock(node)
 	case ast.IfStmt:
 		a.checkIf(node)
-	// case ast.WhileStmt:
-	// 	a.checkWhile(node)
-	// case ast.ForStmt:
-	// 	a.checkFor(node)
-	// case ast.ForEachStmt:
-	// 	a.checkForEach(node)
+	case ast.WhileStmt:
+		a.checkWhile(node)
+	case ast.ForStmt:
+		a.checkFor(node)
+	case ast.ForEachStmt:
+		a.checkForEach(node)
 	case ast.FuncStmt:
 		a.checkFunc(node)
-	// case ast.ImplStmt:
-	// 	a.checkImpl(node)
-	// case ast.ClassStmt:
-	// 	a.checkClass(node)
+	case ast.StructStmt:
+		a.checkStruct(node)
+	case ast.ImplStmt:
+		a.checkImpl(node)
 	case ast.ReturnStmt:
 		a.checkReturn(node)
 	default:
@@ -77,10 +77,12 @@ func (a *Analyser) TypeCheckExpr(expr ast.Expr) ast.Type {
 			Name: param.Name,
 			Type: param.Type.GetType(),
 		}
-	// case ast.MemberExpr:
-	// 	return a.checkMember(node)
-	// case ast.NewExpr:
-	// 	return a.checkNew(node)
+	case ast.MemberExpr:
+		return a.checkMember(node)
+	case ast.NewExpr:
+		return a.checkNew(node)
+	case ast.ThisExpr:
+		return a.checkThis()
 	default:
 		a.Error("unsupported expression type")
 		return ast.PrimitiveType{Type: ast.Invalid}

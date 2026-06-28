@@ -78,6 +78,13 @@ func (n NamedType) GetType() Type_ { return Struct }
 func (n NamedType) GetValue() any  { return nil }
 func (n NamedType) String() string { return n.Name }
 func (n NamedType) Equals(other Type) bool {
+	if other.GetType() != Struct { return false }
+	if nt, ok := other.(NamedType); ok { return n.Name == nt.Name }
+	if st, ok := other.(StructType); ok { return n.Name == st.Name }
+	return false
+}
+
+func (n NamedType) Equals_OLD(other Type) bool {
 	if other.GetType() != Struct {
 		return false
 	}
@@ -157,6 +164,13 @@ func (n StructType) GetType() Type_ { return Struct }
 func (s StructType) GetValue() any  { return nil }
 func (n StructType) String() string { return n.Name }
 func (n StructType) Equals(other Type) bool {
+	if other.GetType() != Struct { return false }
+	if nt, ok := other.(NamedType); ok { return n.Name == nt.Name }
+	if st, ok := other.(StructType); ok { return n.Name == st.Name }
+	return false
+}
+
+func (n StructType) Equals_OLD(other Type) bool {
 	if other.GetType() != Struct {
 		return false
 	}

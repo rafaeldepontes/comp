@@ -1,18 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"os"
-	"strings"
 
+	"github.com/rafaeldepontes/comp/builder"
 	"github.com/rafaeldepontes/comp/lexer"
 	"github.com/rafaeldepontes/comp/parser"
 	semanticAnalyser "github.com/rafaeldepontes/comp/semantic/analyser"
 )
 
 var TestFilePaths = []string{
+	"./examples/control_flow_test.rcs",
+	"./examples/structs_test.rcs",
 	"./examples/test_case_01.rcs",
 	// "./examples/test_case_02.rcs",
 	// "./examples/test_case_03.rcs",
@@ -25,77 +25,35 @@ var TestFilePaths = []string{
 	// "./examples/test_case_10.rcs",
 }
 
-// func main() {
-// 	type_ := ""
-// 	TUI(&type_, false)
-
-// 	for i := range TestFilePaths {
-// 		b, err := os.ReadFile(TestFilePaths[i])
-// 		if err != nil {
-// 			panic("[ERROR] missing example file")
-// 		}
-// 		src := string(b)
-
-// 		var tokens []lexer.Token
-// 		chooseTokenizer(type_, TestFilePaths[i], src, &tokens)
-
-// 		// Tokens are alright I guess...
-// 		// for j := range tokens {
-// 		// 	tokens[j].Debbug()
-// 		// }
-
-// 		// AST seems to have little problems, but I need
-// 		// to test my interpreter to be sure... So more tests
-// 		// are needed in order to decide if this is really
-// 		// correct or not.
-// 		ast := parser.Parse(tokens)
-
-// 		if len(ast.Errors) > 0 {
-// 			printLogs(ast, TestFilePaths[i], src)
-// 		} else {
-// 			fmt.Printf("%sFile: %s is OK\n%s", lexer.ColorBoldCyan, TestFilePaths[i], lexer.ColorReset)
-// 		}
-
-// 		semanticAnalyser.Analyses(ast)
-// 	}
-// }
-
 func main() {
 	type_ := ""
 	TUI(&type_, false)
 
-	scanner := bufio.NewScanner(os.Stdin)
-
-	fmt.Println("Comp running...")
-	for {
-		fmt.Print("> ")
-
-		if !scanner.Scan() {
-			break // EOF (Ctrl+D)
+	for i := range TestFilePaths {
+		b, err := os.ReadFile(TestFilePaths[i])
+		if err != nil {
+			panic("[ERROR] missing example file")
 		}
-
-		src := scanner.Text()
-
-		if strings.TrimSpace(src) == "exit()" {
-			fmt.Println("Goodbye!")
-			break
-		}
+		src := string(b)
 
 		var tokens []lexer.Token
-		chooseTokenizer(type_, "<stdin>", src, &tokens)
+		chooseTokenizer(type_, TestFilePaths[i], src, &tokens)
 
 		ast := parser.Parse(tokens)
-
 		if len(ast.Errors) > 0 {
-			printLogs(ast, "<stdin>", src)
+			printLogs(ast, TestFilePaths[i], src)
 		} else {
-			fmt.Printf("%sInput is OK\n%s", lexer.ColorBoldCyan, lexer.ColorReset)
+			fmt.Printf("%sFile: %s is OK\n%s", lexer.ColorBoldCyan, TestFilePaths[i], lexer.ColorReset)
 		}
 
 		semanticAnalyser.Analyses(ast)
-	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		if len(ast.Errors) == 0 {
+			compBuilder := builder.NewBuilder()
+			err := compBuilder.Build(ast, TestFilePaths[i])
+			if err != nil {
+				fmt.Printf("[ERROR] Builder failed: %v\n", err)
+			}
+		}
 	}
 }

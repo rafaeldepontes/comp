@@ -17,11 +17,13 @@ func Analyses(p ast.BlockStmt) any {
 		a.WalkStmt(p.Body[i])
 	}
 
-	fmt.Println("[INFO] semantic analyser errors:")
-	for i := range a.Errors {
-		fmt.Println(a.Errors[i].Message)
+	if len(a.Errors) > 0 {
+		fmt.Println("[INFO] semantic analyser errors:")
+		for i := range a.Errors {
+			fmt.Println(a.Errors[i].Message)
+		}
+		litter.Dump(a)
 	}
 
-	litter.Dump(a)
 	return nil
 }
